@@ -1,0 +1,2006 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vila Pontica | Hotel boutique în Peninsula Constanța</title>
+    <meta name="description" content="Vila Pontica — hotel boutique cu opt camere într-o clădire din 1928, în inima peninsulei din Constanța.">
+    <meta name="theme-color" content="#073B2D">
+    <script>document.documentElement.classList.add('js');</script>
+
+    <!-- Fonturi: Archivo (lățime extinsă), Anton (condensat), Sanchez (serif), Yellowtail (script) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wdth,wght@62..125,400..800&family=Sanchez:ital@0;1&family=Yellowtail&display=swap" rel="stylesheet">
+
+    <style>
+        /* ================= TOKENS ================= */
+        :root {
+            /* Paletă matură: smarald foarte închis + maro espresso + verde aproape negru,
+               crem pentru text și alamă mată ca accent */
+            --emerald: #073B2D;
+            --brown: #2E1F14;
+            --deep: #031F17;
+            --cream: #F2EAD8;
+            --brass: #C8A96A;
+            --white: #FFFFFF;
+
+            /* Culorile active sunt interpolate din JS în funcție de secțiunea vizibilă */
+            --active-bg: var(--emerald);
+            --active-color: var(--cream);
+            --active-alt: var(--brass);
+
+            /* Luciu de lac: lumină moale din stânga-sus, umbră în dreapta-jos și o bandă de reflexie diagonală.
+               Se aplică pe suprafețele verzi și maro, fixat de ecran ca reflexia să rămână pe loc la scroll. */
+            --sheen:
+                linear-gradient(118deg, transparent 34%, rgba(255, 255, 255, .035) 44%, rgba(255, 255, 255, .085) 50%, rgba(255, 255, 255, .035) 56%, transparent 66%),
+                radial-gradient(120% 85% at 15% -5%, rgba(255, 255, 255, .15), rgba(255, 255, 255, .04) 38%, transparent 62%),
+                radial-gradient(110% 90% at 105% 110%, rgba(0, 0, 0, .45), transparent 60%);
+            /* Luciu pentru butoane și elemente mici */
+            --gloss: linear-gradient(180deg, rgba(255, 255, 255, .24) 0%, rgba(255, 255, 255, .07) 46%, rgba(0, 0, 0, 0) 54%, rgba(0, 0, 0, .22) 100%);
+            --gloss-edge: inset 0 1px 0 rgba(255, 255, 255, .3), inset 0 -1px 0 rgba(0, 0, 0, .35);
+
+            --header-h: 72px;
+            --gutter: clamp(16px, 2.2vw, 32px);
+            --content: 1280px;
+
+            --ease: cubic-bezier(.65, 0, .35, 1);
+            --ease-out: cubic-bezier(.16, 1, .3, 1);
+
+            --f-wide: 'Archivo', 'Arial Black', sans-serif;
+            --f-cond: 'Anton', 'Impact', sans-serif;
+            --f-serif: 'Sanchez', Georgia, serif;
+            --f-script: 'Yellowtail', cursive;
+        }
+
+        /* Scheme de culoare per secțiune (text / fundal / accent) */
+        /* Contrast: crem pe smarald 10:1, crem pe maro 13:1, alamă pe verde-negru 7.9:1, alamă pe maro 7:1 */
+        .s-smarald { --s-color: #F2EAD8; --s-bg: #073B2D; --s-alt: #C8A96A; }
+        .s-maro    { --s-color: #F2EAD8; --s-bg: #2E1F14; --s-alt: #C8A96A; }
+        .s-adanc   { --s-color: #C8A96A; --s-bg: #031F17; --s-alt: #F2EAD8; }
+
+        /* ================= BASE ================= */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+        html.is-locked { overflow: hidden; }
+        body {
+            background-color: var(--active-bg);
+            color: var(--active-color);
+            font-family: var(--f-serif);
+            font-size: 15px;
+            line-height: 1.55;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        img, video { display: block; max-width: 100%; }
+        a { color: inherit; text-decoration: none; }
+        button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+        ul { list-style: none; }
+        :focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+        ::selection { background: var(--active-color); color: var(--active-bg); }
+        section[id], footer[id] { scroll-margin-top: var(--header-h); }
+
+        .icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+        .wrap { max-width: var(--content); margin: 0 auto; }
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        /* elemente care există doar pe mobil (vezi blocul MOBIL de la final); `html` crește prioritatea,
+           ca regulile de componentă (ex. .icon-btn { display: grid }) să nu le facă vizibile pe desktop */
+        html .m-only { display: none; }
+
+        /* ================= TIPOGRAFIE ================= */
+        .t-label {
+            font-family: var(--f-wide); font-stretch: 125%; font-weight: 500;
+            font-size: 12px; letter-spacing: .08em; text-transform: uppercase; line-height: 1.4;
+        }
+        .t-wide {
+            font-family: var(--f-wide); font-stretch: 125%; font-weight: 800;
+            text-transform: uppercase; letter-spacing: .02em; line-height: 1.05;
+        }
+        .t-cond {
+            font-family: var(--f-cond); font-weight: 400;
+            text-transform: uppercase; line-height: .98; letter-spacing: .005em;
+        }
+        .t-script { font-family: var(--f-script); font-weight: 400; line-height: 1; text-transform: none; }
+        .copy { font-family: var(--f-serif); font-size: clamp(14px, 1.05vw, 16px); line-height: 1.6; }
+        .copy + .copy { margin-top: 1.1em; }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: .6em;
+            padding: 12px 18px; border: 1.5px solid currentColor;
+            font-family: var(--f-wide); font-stretch: 125%; font-weight: 600;
+            font-size: 12px; letter-spacing: .08em; text-transform: uppercase; line-height: 1.2; text-align: center;
+            transition: background-color .35s var(--ease-out), color .35s var(--ease-out);
+        }
+        .btn:hover { background: var(--active-color); color: var(--active-bg); }
+
+        .link {
+            display: inline-block; padding-bottom: 4px;
+            font-family: var(--f-wide); font-stretch: 125%; font-weight: 600;
+            font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+            background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1.5px no-repeat;
+            transition: background-size .45s var(--ease-out);
+        }
+        .link:hover { background-size: 35% 1.5px; }
+
+        /* ================= LOADER ================= */
+        .loader {
+            position: fixed; inset: 0; z-index: 200;
+            display: grid; place-items: center;
+            background-color: var(--deep); color: var(--cream);
+            clip-path: inset(0 0 0 0);
+            transition: clip-path 1.1s var(--ease) .15s;
+        }
+        .loader__logo {
+            font-size: clamp(64px, 11vw, 150px);
+            opacity: 0; transform: translateY(24px) rotate(-4deg);
+            animation: loaderIn 1s var(--ease-out) .1s forwards;
+        }
+        .loader__line {
+            position: absolute; left: 50%; bottom: 18%; width: 120px; height: 1.5px;
+            background: currentColor; transform: translateX(-50%) scaleX(0); transform-origin: left;
+            animation: loaderLine 1.4s var(--ease) .3s forwards;
+        }
+        body.is-loaded .loader { clip-path: inset(0 0 100% 0); }
+        @keyframes loaderIn { to { opacity: 1; transform: none; } }
+        @keyframes loaderLine { to { transform: translateX(-50%) scaleX(1); } }
+
+        /* ================= HEADER ================= */
+        .header {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            height: var(--header-h);
+            display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+            padding: 0 var(--gutter);
+            background-color: var(--active-bg); color: var(--active-color);
+        }
+        body.menu-open .header { background-color: var(--emerald); color: var(--cream); }
+
+        .header__left { display: flex; gap: 8px; }
+        .icon-btn {
+            width: 34px; height: 34px; display: grid; place-items: center;
+            border: 1.5px solid currentColor;
+            transition: background-color .3s, color .3s;
+        }
+        .icon-btn .icon { width: 15px; height: 15px; }
+        .icon-btn:hover { background: var(--active-color); color: var(--active-bg); }
+        body.menu-open .icon-btn:hover { background: var(--cream); color: var(--emerald); }
+
+        .header__nav { display: flex; align-items: center; gap: clamp(24px, 5vw, 88px); }
+        .navbtn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 10px;
+            font-family: var(--f-wide); font-stretch: 125%; font-weight: 800;
+            font-size: 14px; letter-spacing: .04em; text-transform: uppercase;
+            transition: background-color .3s, color .3s;
+        }
+        .navbtn .icon { width: 14px; height: 14px; transition: transform .4s var(--ease-out); }
+        .navbtn[aria-expanded="true"] { background: var(--cream); color: var(--emerald); }
+        .navbtn[aria-expanded="true"] .icon { transform: rotate(180deg); }
+        .logo { font-family: var(--f-script); font-size: 36px; line-height: 1; white-space: nowrap; padding-bottom: 4px; }
+
+        .header__right { justify-self: end; display: flex; align-items: center; gap: 8px; }
+        .lang {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 6px 10px; border: 1.5px solid currentColor;
+            font-family: var(--f-wide); font-stretch: 125%; font-size: 12px; font-weight: 500; letter-spacing: .06em;
+        }
+        .lang .icon { width: 12px; height: 12px; }
+        .header__close { display: none; }
+        body.menu-open .header__close { display: inline-flex; }
+        body.menu-open .lang:not(.header__close) { display: none; }
+        .menu-toggle { display: none; }
+
+        /* ================= BADGE "REZERVĂ ACUM" ================= */
+        .badge {
+            position: fixed; z-index: 90;
+            top: calc(var(--header-h) + 12px); right: var(--gutter);
+            width: 108px; height: 108px; border-radius: 50%;
+            display: grid; place-items: center;
+            background-color: var(--active-bg); color: var(--active-color);
+            transition: transform .5s var(--ease-out), opacity .4s;
+        }
+        .badge:hover { transform: scale(1.06); }
+        body.menu-open .badge { opacity: 0; pointer-events: none; }
+        .badge__ring { position: absolute; inset: 0; width: 100%; height: 100%; animation: spin 14s linear infinite; }
+        .badge__ring text, .menu__badge text {
+            font-family: var(--f-wide); font-stretch: 125%; font-weight: 700;
+            font-size: 10.5px; letter-spacing: .05em; fill: currentColor;
+        }
+        .badge__ring circle, .menu__badge circle { fill: none; stroke: currentColor; stroke-width: 1.4; }
+        .badge__icon {
+            position: relative; width: 50px; height: 50px; border-radius: 50%;
+            background: var(--active-color); color: var(--active-bg);
+            display: grid; place-items: center; overflow: hidden;
+        }
+        .badge__icon > * {
+            position: absolute; inset: 0; margin: auto;
+            opacity: 0; transform: translateY(70%) rotate(-30deg);
+            transition: opacity .45s var(--ease-out), transform .6s var(--ease-out);
+        }
+        .badge__icon > .is-on { opacity: 1; transform: none; }
+        .badge__icon .icon { width: 26px; height: 26px; stroke-width: 1.7; }
+        .badge__icon .badge__vp { width: auto; height: auto; display: grid; place-items: center; font-family: var(--f-script); font-size: 26px; line-height: 1; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ================= MENIU CARTIER / HOTEL ================= */
+        .menu {
+            position: fixed; z-index: 95; inset: var(--header-h) 0 0 0;
+            display: grid; grid-template-columns: 1fr auto 1fr; gap: var(--gutter);
+            padding: clamp(24px, 4vw, 48px) var(--gutter) 40px;
+            overflow-y: auto;
+            background-color: var(--emerald); color: var(--cream);
+            clip-path: inset(0 0 100% 0); visibility: hidden;
+            transition: clip-path .75s var(--ease), background-color .55s var(--ease), color .55s var(--ease), visibility 0s linear .75s;
+        }
+        .menu.is-open { clip-path: inset(0 0 0 0); visibility: visible; transition: clip-path .75s var(--ease), background-color .55s var(--ease), color .55s var(--ease), visibility 0s; }
+        .menu[data-active="hotel"] { background-color: var(--brown); color: var(--cream); }
+
+        .menu__tabs { display: none; }
+        .menu__col { opacity: .26; transition: opacity .55s var(--ease); }
+        .menu__col:hover { opacity: .5; }
+        .menu[data-active="cartier"] .menu__col--cartier,
+        .menu[data-active="hotel"] .menu__col--hotel { opacity: 1; }
+        .menu__col--hotel { text-align: right; }
+
+        .menu__title { display: block; width: 100%; text-align: inherit; font-size: clamp(34px, 4.2vw, 60px); margin-bottom: clamp(18px, 2.6vw, 36px); }
+        .menu__list li + li { margin-top: clamp(10px, 1.3vw, 18px); }
+        .menu__sub { display: block; font-family: var(--f-wide); font-stretch: 125%; font-size: 13px; letter-spacing: .04em; margin-bottom: 2px; }
+        .menu__link {
+            display: inline-block;
+            font-family: var(--f-wide); font-stretch: 125%; font-weight: 500;
+            font-size: clamp(18px, 1.9vw, 26px); letter-spacing: .03em; text-transform: uppercase; line-height: 1.15;
+            background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat;
+            transition: background-size .45s var(--ease-out);
+            padding-bottom: 3px;
+        }
+        .menu__col--hotel .menu__link { background-position: 100% 100%; }
+        .menu__link:hover { background-size: 100% 2px; }
+
+        .menu__item { opacity: 0; transform: translateY(18px); }
+        .menu__col.is-animating .menu__item { animation: itemIn .8s var(--ease-out) both; animation-delay: calc(var(--i) * 45ms + 120ms); }
+        .menu__col:not(.is-animating) .menu__item { opacity: 1; transform: none; }
+        @keyframes itemIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+        .menu__center { position: relative; width: clamp(200px, 22vw, 320px); display: flex; flex-direction: column; align-items: center; gap: 28px; padding-top: 12px; }
+        .menu__photo { position: relative; width: 100%; aspect-ratio: 4 / 5; transform: rotate(-5deg); }
+        .menu__photo .pol { position: absolute; inset: 0; opacity: 0; transition: opacity .6s var(--ease), transform .8s var(--ease-out); transform: rotate(6deg) scale(.94); }
+        .menu[data-active="cartier"] .pol--cartier,
+        .menu[data-active="hotel"] .pol--hotel { opacity: 1; transform: none; }
+        .menu__photo img { filter: sepia(.55) contrast(1.05) saturate(.8); }
+        .menu__badge { width: 92px; height: 92px; animation: spin 18s linear infinite; }
+
+        /* ================= POLAROID (reutilizat) ================= */
+        .pol { background: #FFFDF6; padding: 10px 10px 36px; box-shadow: 0 14px 34px rgba(2, 22, 16, .28); }
+        .pol img { width: 100%; height: 100%; object-fit: cover; }
+        .pol figcaption { position: absolute; left: 0; right: 0; bottom: 6px; text-align: center; font-family: var(--f-script); font-size: 20px; color: var(--emerald); }
+
+        /* ================= HERO ================= */
+        .hero-stage { position: relative; }
+        .hero {
+            position: sticky; top: 0; z-index: 1;
+            height: 100vh; height: 100svh;
+            padding: var(--header-h) var(--gutter) var(--gutter);
+        }
+        .hero__frame {
+            position: relative; width: 100%; height: 100%; overflow: hidden;
+            transform-origin: 50% 55%;
+            will-change: transform, filter, opacity;
+            color: var(--white);
+        }
+        .hero__media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.04); animation: heroZoom 14s var(--ease-out) forwards; }
+        @keyframes heroZoom { from { transform: scale(1.14); } to { transform: scale(1.04); } }
+        .hero__shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(1, 14, 10, .32) 0%, rgba(1, 14, 10, .12) 38%, rgba(1, 14, 10, .45) 100%); }
+        .hero__content {
+            position: relative; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 0 var(--gutter); text-align: center;
+        }
+        .hero__title {
+            font-size: clamp(46px, 6.4vw, 104px);
+            max-width: 13ch; min-height: 2em;
+            text-shadow: 0 2px 30px rgba(1, 14, 10, .25);
+        }
+        .hero__cursor { display: inline-block; width: .06em; height: .82em; margin-left: .08em; background: currentColor; vertical-align: -.04em; animation: blink 1s steps(1) infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+        .hero__scroll {
+            position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%);
+            display: inline-flex; align-items: center; gap: 8px; color: var(--white);
+        }
+        .hero__scroll .icon { width: 14px; height: 14px; animation: nudge 1.8s var(--ease) infinite; }
+        @keyframes nudge { 50% { transform: translateY(4px); } }
+
+        /* ---------- Bara de rezervare ---------- */
+        .finder {
+            position: relative; margin-top: clamp(24px, 3vw, 40px);
+            display: flex; align-items: stretch;
+            background: var(--white); color: var(--emerald);
+            border: 1.5px solid var(--emerald);
+            text-align: left;
+            opacity: 0; transform: translateY(16px);
+            transition: opacity .9s var(--ease-out) .2s, transform 1s var(--ease-out) .2s;
+        }
+        body.is-typed .finder { opacity: 1; transform: none; }
+        .finder__field {
+            position: relative; display: flex; align-items: center; gap: 10px;
+            padding: 10px 18px; min-width: 190px; text-align: left;
+            border-right: 1px solid #E7E2D6;
+        }
+        .finder__field:hover { background: #FAFAF4; }
+        .finder__field .icon { width: 16px; height: 16px; }
+        .finder__label { display: block; font-family: var(--f-wide); font-size: 11px; color: #6E6A61; line-height: 1.2; }
+        .finder__value { display: block; font-family: var(--f-wide); font-size: 14px; color: var(--emerald); line-height: 1.3; white-space: nowrap; }
+        .finder__field input.finder__value { border: 0; outline: 0; background: transparent; width: 100px; padding: 0; }
+        .finder__field input.finder__value::placeholder { color: #9A958A; }
+        .finder__submit {
+            padding: 0 26px; background-color: var(--emerald); color: var(--cream);
+            font-family: var(--f-wide); font-stretch: 125%; font-weight: 700; font-size: 14px; letter-spacing: .06em; text-transform: uppercase;
+            transition: background-color .3s;
+        }
+        .finder__submit:hover { background-color: var(--deep); }
+        .pop {
+            position: absolute; top: calc(100% + 8px); left: -1.5px; z-index: 5;
+            min-width: 280px; padding: 18px;
+            background: var(--white); color: var(--emerald);
+            border: 1.5px solid var(--emerald);
+            box-shadow: 0 18px 40px rgba(2, 22, 16, .22);
+            opacity: 0; visibility: hidden; transform: translateY(-6px);
+            transition: opacity .3s var(--ease-out), transform .4s var(--ease-out), visibility 0s linear .3s;
+        }
+        .pop.is-open { opacity: 1; visibility: visible; transform: none; transition: opacity .3s var(--ease-out), transform .4s var(--ease-out), visibility 0s; }
+        .pop__row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+        .pop__row + .pop__row { margin-top: 14px; }
+        .pop__row label, .pop__row > span { font-family: var(--f-wide); font-size: 13px; }
+        .pop input[type="date"] { font-family: var(--f-wide); font-size: 13px; color: var(--emerald); border: 1px solid #DDD7C8; padding: 6px 8px; background: #FCFCF7; }
+        .stepper { display: flex; align-items: center; gap: 12px; font-family: var(--f-wide); font-size: 14px; }
+        .stepper button { width: 28px; height: 28px; border: 1.5px solid var(--emerald); display: grid; place-items: center; font-size: 16px; line-height: 1; }
+        .stepper button:disabled { opacity: .3; cursor: default; }
+        .stepper output { min-width: 14px; text-align: center; }
+        .pop__note { margin-top: 12px; font-family: var(--f-serif); font-size: 12px; color: #6E6A61; }
+
+        /* ================= INTRO ================= */
+        .intro {
+            position: relative; z-index: 2;
+            background-color: var(--active-bg);
+            padding: clamp(110px, 13vw, 190px) var(--gutter) clamp(110px, 14vw, 210px);
+            text-align: center;
+            transform-origin: 50% 0;
+            
+        }
+        .intro__script {
+            position: absolute; left: 50%; top: 0; z-index: 3;
+            font-size: clamp(64px, 9vw, 150px);
+            transform: translate(-50%, -48%) rotate(-7deg);
+            white-space: nowrap; pointer-events: none;
+        }
+        .intro__title { font-size: clamp(42px, 5.6vw, 92px); max-width: 15ch; margin: 0 auto; position: relative; z-index: 2; }
+        .intro__copy { max-width: 560px; margin: clamp(32px, 4vw, 52px) auto 0; position: relative; z-index: 2; }
+        .intro__copy .copy { font-size: clamp(15px, 1.15vw, 17px); }
+
+        .sticker { position: absolute; z-index: 1; will-change: transform; pointer-events: none; }
+        .sticker--pol-l { left: 3%; top: 54%; width: clamp(130px, 13vw, 200px); aspect-ratio: 4 / 5; }
+        .sticker--pol-r { right: 4%; top: 64%; width: clamp(120px, 12vw, 180px); aspect-ratio: 1; }
+        .sticker--ticket { right: 3%; top: 30%; }
+        .sticker--stamp { left: 6%; top: 12%; }
+
+        .ticket {
+            position: relative; width: clamp(170px, 15vw, 220px); padding: 16px 18px 14px;
+            background-color: var(--brown); color: var(--cream); text-align: left;
+            -webkit-mask: radial-gradient(circle 9px at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat,
+                          radial-gradient(circle 9px at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat;
+                    mask: radial-gradient(circle 9px at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat,
+                          radial-gradient(circle 9px at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat;
+            box-shadow: 0 10px 24px rgba(2, 22, 16, .2);
+        }
+        .ticket__top { display: flex; justify-content: space-between; font-family: var(--f-wide); font-stretch: 125%; font-size: 9px; letter-spacing: .1em; }
+        .ticket__name { display: block; font-family: var(--f-script); font-size: 38px; line-height: 1.05; margin: 6px 0 4px; }
+        .ticket__line { border-top: 1.5px dashed currentColor; margin: 8px 0; opacity: .7; }
+        .ticket__bottom { font-family: var(--f-wide); font-stretch: 125%; font-weight: 800; font-size: 11px; letter-spacing: .08em; }
+
+        .stamp { width: clamp(110px, 10vw, 140px); aspect-ratio: 1; color: inherit; }
+        .stamp svg { width: 100%; height: 100%; }
+        .stamp text { font-family: var(--f-wide); font-stretch: 125%; font-weight: 700; font-size: 11px; letter-spacing: .08em; fill: currentColor; }
+        .stamp .stamp__vp { font-family: var(--f-script); font-size: 40px; letter-spacing: 0; font-weight: 400; }
+        .stamp circle { fill: none; stroke: currentColor; }
+
+        /* ================= CAMERE ================= */
+        .rooms { position: relative; padding: clamp(110px, 12vw, 190px) var(--gutter) clamp(100px, 11vw, 170px); }
+        .rooms__head { max-width: 620px; }
+        .rooms__title { font-size: clamp(44px, 5vw, 84px); margin: 14px 0 22px; }
+        .rooms__grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(56px, 6vw, 88px) clamp(24px, 3vw, 44px); margin-top: clamp(56px, 6vw, 88px); }
+        .room__media { position: relative; aspect-ratio: 5 / 4; overflow: hidden; background: rgba(0, 0, 0, .08); touch-action: pan-y; }
+        .room__track { display: flex; height: 100%; transition: transform .8s var(--ease); }
+        .room__track img { flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; transition: transform 1.4s var(--ease-out); user-select: none; -webkit-user-drag: none; }
+        .room:hover .room__track img { transform: scale(1.035); }
+        .room__ui { position: absolute; top: 14px; right: 14px; display: flex; gap: 6px; color: var(--cream); }
+        .room__count, .room__expand {
+            height: 30px; min-width: 30px; padding: 0 8px; display: grid; place-items: center;
+            border: 1.5px solid currentColor; background: rgba(7, 59, 45, .3); backdrop-filter: blur(6px);
+            font-family: var(--f-wide); font-stretch: 125%; font-size: 11px; letter-spacing: .06em;
+        }
+        .room__expand .icon { width: 14px; height: 14px; }
+        .room__nav {
+            position: absolute; top: 50%; width: 44px; height: 44px; margin-top: -22px;
+            display: grid; place-items: center;
+            background: var(--cream); color: var(--emerald);
+            opacity: 0; transition: opacity .35s, transform .45s var(--ease-out);
+        }
+        .room__nav--prev { left: 14px; transform: translateX(-10px); }
+        .room__nav--next { right: 14px; transform: translateX(10px); }
+        .room__media:hover .room__nav, .room__nav:focus-visible { opacity: 1; transform: none; }
+        .room__info { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-top: 20px; }
+        .room__title { font-size: clamp(28px, 2.8vw, 44px); }
+        .room__info .t-label { white-space: nowrap; }
+        .room__desc { margin-top: 10px; max-width: 46ch; }
+        .rooms__cta { margin-top: clamp(56px, 6vw, 90px); text-align: center; }
+
+        /* ================= O ZI ÎN PENINSULĂ ================= */
+        .day { position: relative; padding: clamp(110px, 12vw, 190px) var(--gutter); }
+        .day__grid { display: grid; grid-template-columns: 1fr minmax(300px, 540px) 1fr; align-items: center; gap: clamp(24px, 4vw, 64px); }
+        .day__title { font-size: clamp(40px, 4.2vw, 70px); margin-top: 14px; }
+        .day__aside { max-width: 300px; justify-self: end; }
+        .day__aside .copy { color: var(--active-alt); }
+        .day__aside .btn { margin-top: 26px; }
+        .day__stage { position: relative; aspect-ratio: 1; display: grid; place-items: center; }
+        .day__ring { position: absolute; inset: 0; width: 100%; height: 100%; animation: spin 32s linear infinite; }
+        .day__ring text { font-family: var(--f-wide); font-stretch: 125%; font-weight: 600; font-size: 21px; letter-spacing: .06em; fill: currentColor; }
+        .day__stack { position: relative; width: 60%; aspect-ratio: 1; }
+        .day__card { position: absolute; inset: 0; opacity: 0; }
+        .day__card .pol { position: absolute; inset: 0; padding-bottom: 10px; }
+
+        .hours { margin-top: clamp(90px, 10vw, 150px); }
+        .hours__head { display: flex; justify-content: space-between; align-items: end; gap: 24px; flex-wrap: wrap; }
+        .hours__head h3 { font-size: clamp(22px, 2vw, 30px); }
+        .hours__bar { position: relative; display: flex; justify-content: space-between; gap: 8px; margin-top: 28px; padding-top: 18px; overflow-x: auto; scrollbar-width: none; }
+        .hours__bar::-webkit-scrollbar { display: none; }
+        .hours__bar::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1.5px; background: currentColor; opacity: .3; }
+        .hours__fill { position: absolute; left: 0; top: 0; height: 1.5px; width: 100%; background: currentColor; transform-origin: left; transform: scaleX(var(--hp, 0)); transition: transform .9s var(--ease); }
+        .hours__btn { flex: none; padding: 7px 10px; font-family: var(--f-wide); font-stretch: 125%; font-size: 12px; letter-spacing: .08em; transition: background-color .3s, color .3s; }
+        .hours__btn:hover { background: color-mix(in srgb, currentColor 14%, transparent); }
+        .hours__btn[aria-selected="true"] { background: var(--active-color); color: var(--active-bg); font-weight: 700; }
+        .hours__panel { display: grid; grid-template-columns: minmax(220px, 380px) 1fr; gap: clamp(32px, 6vw, 100px); align-items: center; margin-top: clamp(40px, 5vw, 72px); transition: opacity .35s var(--ease), transform .5s var(--ease-out); }
+        .hours__panel.is-swapping { opacity: 0; transform: translateY(14px); }
+        .hours__photo { position: relative; aspect-ratio: 1; transform: rotate(-3deg); }
+        .hours__photo .pol { position: absolute; inset: 0; }
+        .hours__time { font-size: clamp(64px, 9vw, 150px); line-height: .9; }
+        .hours__name { font-size: clamp(20px, 2vw, 30px); margin: 14px 0 16px; }
+        .hours__text { max-width: 480px; color: var(--active-alt); }
+
+        /* ================= SLIDER FIXAT LA SCROLL ================= */
+        .slides { position: relative; height: calc(var(--n, 3) * 100vh); }
+        .slides__pin {
+            position: sticky; top: 0; height: 100vh; overflow: hidden;
+            display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: center;
+            gap: clamp(32px, 6vw, 110px);
+            padding: calc(var(--header-h) + 28px) calc(var(--gutter) + 8px) 44px calc(var(--gutter) + 28px);
+        }
+        .slides__progress { position: absolute; left: var(--gutter); top: calc(var(--header-h) + 28px); bottom: 44px; width: 3px; background: color-mix(in srgb, currentColor 22%, transparent); }
+        .slides__progress span { position: absolute; inset: 0; background: currentColor; transform-origin: top; transform: scaleY(var(--p, 0)); }
+        .slides__media { position: relative; height: 100%; max-height: 74vh; overflow: hidden; }
+        .slides__track { display: flex; height: 100%; transition: transform 1s var(--ease); }
+        .slides__track img { flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; }
+        .slides__text { position: relative; min-height: 340px; }
+        .slide-text { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; opacity: 0; transform: translateY(26px); pointer-events: none; transition: opacity .6s var(--ease), transform .9s var(--ease-out); }
+        .slide-text.is-active { opacity: 1; transform: none; pointer-events: auto; }
+        .slide-text h3 { font-size: clamp(38px, 4.2vw, 72px); margin: 16px 0 26px; max-width: 12ch; }
+        .slide-text .copy { max-width: 400px; margin-bottom: 28px; color: var(--active-alt); }
+        .slides__count { position: absolute; right: calc(var(--gutter) + 8px); bottom: 44px; }
+
+        /* ================= CARTIER ================= */
+        .cartier { position: relative; padding: clamp(110px, 12vw, 190px) 0 clamp(110px, 12vw, 180px); overflow: hidden; }
+        .cartier__script { font-size: clamp(76px, 11.5vw, 190px); text-align: center; transform: rotate(-6deg); line-height: .92; padding: 0 var(--gutter); }
+        .cartier__script span { display: block; }
+        .cartier__script span:last-child { padding-left: 1.2em; }
+        .drift { margin-top: clamp(40px, 5vw, 70px); cursor: grab; touch-action: pan-y; user-select: none; }
+        .drift.is-dragging { cursor: grabbing; }
+        .drift__track { display: flex; align-items: flex-start; gap: clamp(20px, 2.4vw, 40px); width: max-content; padding: 0 var(--gutter); will-change: transform; }
+        .drift__item { flex: none; width: clamp(210px, 23vw, 360px); overflow: hidden; }
+        .drift__item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-user-drag: none; transition: transform 1.2s var(--ease-out); }
+        .drift__item:hover img { transform: scale(1.05); }
+        .drift__item:nth-child(3n+1) { aspect-ratio: 4 / 5; margin-top: 70px; }
+        .drift__item:nth-child(3n+2) { aspect-ratio: 4 / 3; margin-top: 0; }
+        .drift__item:nth-child(3n) { aspect-ratio: 3 / 4; margin-top: 150px; }
+        .cartier__text { max-width: 760px; margin: clamp(90px, 10vw, 150px) auto 0; padding: 0 var(--gutter); text-align: center; }
+        .cartier__text h2 { font-size: clamp(36px, 4.4vw, 72px); }
+        .cartier__text .copy { max-width: 540px; margin: 28px auto 34px; }
+
+        /* ================= FOOTER ================= */
+        .footer { position: relative; padding-top: clamp(40px, 6vw, 90px); }
+        .footer__logo {
+            position: relative; z-index: 1;
+            font-size: clamp(88px, 21vw, 360px); line-height: .78;
+            text-align: center; white-space: nowrap;
+            transform: translateY(.13em);
+        }
+        .footer__base { background-color: var(--deep); color: var(--cream); padding: clamp(60px, 7vw, 100px) var(--gutter) 36px; }
+        .footer__grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 40px; }
+        .footer__grid h4 { margin-bottom: 18px; font-size: 15px; }
+        .footer__grid li + li { margin-top: 8px; }
+        .footer__grid a:hover { text-decoration: underline; text-underline-offset: 4px; }
+        .footer__address { border-right: 1.5px solid color-mix(in srgb, var(--cream) 35%, transparent); padding-right: 40px; }
+        .footer__address .link { margin-top: 22px; }
+        .footer__legal { margin-top: clamp(56px, 6vw, 90px); padding-top: 22px; border-top: 1px solid color-mix(in srgb, var(--cream) 25%, transparent); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 11px; }
+
+        /* ================= LIGHTBOX & TOAST ================= */
+        .lightbox {
+            position: fixed; inset: 0; z-index: 150;
+            display: grid; grid-template-rows: auto 1fr auto; gap: 16px;
+            padding: 20px var(--gutter);
+            background: rgba(2, 22, 16, .97); color: var(--cream);
+            opacity: 0; visibility: hidden;
+            transition: opacity .45s var(--ease), visibility 0s linear .45s;
+        }
+        .lightbox.is-open { opacity: 1; visibility: visible; transition: opacity .45s var(--ease), visibility 0s; }
+        .lightbox__top, .lightbox__bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+        .lightbox__title { font-size: clamp(26px, 3vw, 44px); }
+        .lightbox__stage { position: relative; min-height: 0; display: grid; place-items: center; touch-action: pan-y; }
+        .lightbox__stage img { max-width: 100%; max-height: 100%; object-fit: contain; transition: opacity .35s var(--ease); }
+        .lightbox__stage img.is-fading { opacity: 0; }
+        .lightbox .icon-btn { width: 44px; height: 44px; }
+        .lightbox .icon-btn:hover { background: var(--cream); color: var(--emerald); }
+
+        .toast {
+            position: fixed; left: 50%; bottom: 24px; z-index: 160;
+            max-width: min(560px, calc(100vw - 32px));
+            padding: 14px 20px;
+            background-color: var(--emerald); color: var(--cream);
+            border: 1.5px solid var(--cream);
+            font-family: var(--f-serif); font-size: 14px; line-height: 1.5;
+            transform: translate(-50%, 140%); opacity: 0;
+            transition: transform .6s var(--ease-out), opacity .4s;
+        }
+        .toast.is-on { transform: translate(-50%, 0); opacity: 1; }
+
+        /* ================= REZERVARE PE MOBIL ================= */
+        .mfinder, .sheet { display: none; }
+
+        /* ================= LUCIU (suprafețe verzi și maro) ================= */
+        body, .intro, .header, .menu, .footer__base, .loader {
+            background-image: var(--sheen);
+            background-attachment: fixed;
+        }
+        .badge { background-image: radial-gradient(circle at 30% 22%, rgba(255, 255, 255, .26), rgba(255, 255, 255, .05) 45%, transparent 62%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 8px 22px rgba(1, 14, 10, .35); }
+        .gloss { position: relative; overflow: hidden; background-image: var(--gloss); box-shadow: var(--gloss-edge); }
+        .gloss::after {
+            content: ""; position: absolute; top: -10%; bottom: -10%; left: -60%; width: 45%;
+            background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .38), transparent);
+            transform: skewX(-20deg); pointer-events: none; opacity: 0;
+        }
+        /* butoanele principale strălucesc singure din când în când; restul doar la hover */
+        .gloss--auto::after { opacity: 1; animation: shine 6.5s var(--ease) 2s infinite; }
+        .gloss:hover::after, .gloss--auto:hover::after { opacity: 1; animation: shineOnce 1.1s var(--ease) both; }
+        @keyframes shine {
+            0% { transform: skewX(-20deg) translateX(0); }
+            18%, 100% { transform: skewX(-20deg) translateX(420%); }
+        }
+        @keyframes shineOnce { from { transform: skewX(-20deg) translateX(0); } to { transform: skewX(-20deg) translateX(420%); } }
+        .toast.gloss { position: fixed; }
+        .ticket.gloss { box-shadow: var(--gloss-edge), 0 10px 24px rgba(2, 22, 16, .2); }
+
+        /* ================= REVEAL ================= */
+        .js [data-reveal] { opacity: 0; transform: translateY(44px); transition: opacity 1s var(--ease-out) var(--d, 0ms), transform 1.2s var(--ease-out) var(--d, 0ms); }
+        .js [data-reveal].is-in { opacity: 1; transform: none; }
+
+        /* ================= RESPONSIVE ================= */
+        @media (max-width: 1100px) {
+            .day__grid { grid-template-columns: 1fr 1fr; }
+            .day__intro { grid-column: 1 / -1; }
+            .day__aside { justify-self: start; }
+            .footer__grid { grid-template-columns: 1fr 1fr; }
+            .footer__address { border-right: 0; padding-right: 0; }
+        }
+        @media (max-width: 900px) {
+            :root { --header-h: 64px; }
+            .header__left .icon-btn, .navbtn { display: none; }
+            .menu-toggle { display: inline-flex; }
+            .header__nav { gap: 0; }
+            .logo { font-size: 32px; }
+            .badge { width: 84px; height: 84px; }
+            .badge__icon { width: 38px; height: 38px; }
+            .badge__icon .icon { width: 20px; height: 20px; }
+
+            .menu { grid-template-columns: 1fr; align-content: start; }
+            .menu__tabs { display: flex; gap: 8px; margin-bottom: 8px; }
+            .menu__tabs button { padding: 8px 12px; border: 1.5px solid currentColor; font-family: var(--f-wide); font-stretch: 125%; font-weight: 800; font-size: 13px; letter-spacing: .04em; }
+            .menu__tabs button[aria-selected="true"] { background: currentColor; }
+            .menu__tabs button[aria-selected="true"] span { color: var(--emerald); }
+            .menu[data-active="hotel"] .menu__tabs button[aria-selected="true"] span { color: var(--brown); }
+            .menu__col { display: none; opacity: 1; }
+            .menu[data-active="cartier"] .menu__col--cartier,
+            .menu[data-active="hotel"] .menu__col--hotel { display: block; }
+            .menu__col--hotel { text-align: left; }
+            .menu__col--hotel .menu__link { background-position: 0 100%; }
+            .menu__title { display: none; }
+            .menu__center { order: 10; width: 160px; flex-direction: row; align-items: center; margin-top: 24px; }
+            .menu__badge { display: none; }
+
+            .rooms__grid { grid-template-columns: 1fr; }
+            .day__grid { grid-template-columns: 1fr; }
+            .day__stage { max-width: 440px; width: 100%; justify-self: center; }
+            .hours__panel { grid-template-columns: 1fr; }
+            .hours__photo { max-width: 300px; }
+
+            .slides__pin { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; gap: 24px; padding-left: calc(var(--gutter) + 18px); padding-bottom: 32px; }
+            .slides__media { max-height: none; }
+            .slides__text { min-height: 280px; }
+            .slide-text { justify-content: flex-start; }
+            .slides__count { display: none; }
+            .slides__progress { bottom: 32px; }
+        }
+        @media (max-width: 767px) {
+            /* Pe mobil bara din hero e înlocuită de bara fixă de jos (.mfinder) */
+            .finder { display: none; }
+            .hero__scroll { bottom: 96px; }
+            .toast { bottom: calc(92px + env(safe-area-inset-bottom)); }
+            .footer__base { padding-bottom: 120px; }
+
+            .mfinder {
+                display: flex; align-items: stretch;
+                position: fixed; z-index: 80;
+                left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom));
+                height: 58px;
+                background: var(--white); color: var(--emerald);
+                border: 1.5px solid var(--emerald);
+                box-shadow: 0 12px 30px rgba(2, 22, 16, .25);
+                transition: opacity .3s, visibility .3s, transform .5s var(--ease-out);
+            }
+            body:not(.is-loaded) .mfinder,
+            body.mfinder-off .mfinder,
+            body.menu-open .mfinder,
+            html.is-locked .mfinder { opacity: 0; visibility: hidden; transform: translateY(24px); }
+            .mfinder__part {
+                display: flex; align-items: center; gap: 8px; padding: 0 12px;
+                border-right: 1px solid #E7E2D6;
+                font-family: var(--f-wide); font-size: 13px; white-space: nowrap;
+            }
+            .mfinder__part:active { background: #FAFAF4; }
+            .mfinder__part .icon { width: 18px; height: 18px; }
+            .mfinder__dates { flex: 1; min-width: 0; }
+            .mfinder__dates span { overflow: hidden; text-overflow: ellipsis; }
+            .mfinder__part:nth-child(3) { border-right: 0; }
+            .mfinder__go { flex: none; width: 46px; margin: 5px; display: grid; place-items: center; background-color: var(--emerald); color: var(--cream); }
+            .mfinder__go .icon { width: 20px; height: 20px; stroke-width: 2.2; }
+
+            .sheet { display: block; position: fixed; inset: 0; z-index: 140; visibility: hidden; transition: visibility 0s linear .55s; }
+            .sheet.is-open { visibility: visible; transition: none; }
+            .sheet__backdrop { position: absolute; inset: 0; background: rgba(2, 22, 16, .55); opacity: 0; transition: opacity .4s var(--ease); }
+            .sheet.is-open .sheet__backdrop { opacity: 1; }
+            .sheet__panel {
+                position: absolute; left: 0; right: 0; bottom: 0;
+                max-height: 88vh; max-height: 88svh; overflow-y: auto; overscroll-behavior: contain;
+                padding: 0 20px calc(20px + env(safe-area-inset-bottom));
+                background: var(--cream); color: var(--emerald);
+                transform: translateY(100%);
+                transition: transform .55s var(--ease-out);
+            }
+            .sheet.is-open .sheet__panel { transform: none; }
+            .sheet__panel.is-dragging { transition: none; }
+            .sheet__grab { position: sticky; top: 0; z-index: 1; padding-top: 10px; background: var(--cream); touch-action: none; }
+            .sheet__handle { display: block; width: 44px; height: 4px; margin: 0 auto 10px; border-radius: 2px; background: currentColor; opacity: .3; }
+            .sheet__head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 1.5px solid currentColor; }
+            .sheet__head h2 { font-size: 22px; }
+            .sheet__group { padding: 18px 0; border-bottom: 1px solid color-mix(in srgb, var(--emerald) 18%, transparent); transition: background-color .6s; }
+            .sheet__group.is-focus { background: color-mix(in srgb, var(--emerald) 7%, transparent); }
+            .sheet__group > .t-label { display: block; margin-bottom: 12px; }
+            .sheet__group .pop__row span { font-family: var(--f-wide); font-size: 14px; }
+            .sheet__dates { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+            .sheet__dates label { display: grid; gap: 6px; font-family: var(--f-wide); font-size: 12px; }
+            .sheet__dates input, .sheet__input {
+                width: 100%; min-height: 46px; padding: 10px 12px;
+                border: 1.5px solid var(--emerald); background: var(--white); color: var(--emerald);
+                font-family: var(--f-wide); font-size: 16px; border-radius: 0; -webkit-appearance: none; appearance: none;
+            }
+            .sheet__note { margin-top: 10px; font-size: 13px; }
+            .stepper button { width: 36px; height: 36px; }
+            .sheet__submit {
+                width: 100%; margin-top: 20px; padding: 18px;
+                background-color: var(--emerald); color: var(--cream);
+                font-family: var(--f-wide); font-stretch: 125%; font-weight: 700; font-size: 14px; letter-spacing: .06em; text-transform: uppercase;
+            }
+            /* Stickerele stau într-o fâșie sub text, ca să nu-l acopere */
+            .intro { padding-bottom: 300px; }
+            .sticker--pol-r, .sticker--stamp { display: none; }
+            .sticker--pol-l { top: auto; bottom: 50px; left: 6%; width: 120px; }
+            .sticker--ticket { top: auto; bottom: 64px; right: 5%; }
+            .ticket { width: 160px; }
+            .room__nav { opacity: 1; transform: none; width: 38px; height: 38px; margin-top: -19px; }
+            .footer__grid { grid-template-columns: 1fr; }
+            .footer__legal { flex-direction: column; }
+        }
+        /* ================= MOBIL (doar ≤767px; desktopul rămâne neatins) ================= */
+        @media (max-width: 767px) {
+            /* --- Stabilitate: fără scroll lateral (inelul rotit din „O zi” ieșea din ecran) --- */
+            html, body { overflow-x: clip; }
+            .day { overflow-x: clip; }
+
+            /* --- Luciu: strat fix compus pe GPU în loc de background-attachment: fixed, care sacadează pe Android --- */
+            body { background-image: none; }
+            body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background-image: var(--sheen); }
+            .header, .menu { background-attachment: scroll; background-size: 100vw 100vh; }
+            .header { background-position: 0 0; }
+            .menu { background-position: 0 calc(var(--header-h) * -1); }
+            .intro { background-image: radial-gradient(120% 55% at 15% 0%, rgba(255, 255, 255, .1), transparent 62%); background-attachment: scroll; }
+            .footer__base, .loader { background-attachment: scroll; }
+
+            /* --- Tipografie: minimum 16px pentru text, ținte de atingere de minimum 44px --- */
+            body { font-size: 16px; }
+            .copy { font-size: 16px; line-height: 1.65; }
+            .t-label { letter-spacing: .07em; }
+            .btn { min-height: 50px; padding: 14px 20px; font-size: 13px; }
+            .link { padding: 14px 0 6px; font-size: 13px; }
+
+            /* --- Header: „RO” nu ajută pe telefon; apelul telefonic e cea mai valoroasă acțiune --- */
+            .header__right > .lang:not(.header__close) { display: none; }
+            html .header__call { display: grid; width: 40px; height: 40px; }
+            body.menu-open .header__call { display: none; }
+            .lang { min-height: 40px; padding: 8px 14px; font-size: 13px; }
+            /* insigna rotundă acoperea conținutul și dubla bara de rezervare de jos */
+            .badge { display: none; }
+
+            /* --- Meniu: linkuri mai înalte + acțiunile principale, pentru că bara de jos e ascunsă aici --- */
+            .menu__list li + li { margin-top: 2px; }
+            .menu__link { padding: 9px 0 7px; font-size: 20px; }
+            .menu__sub { margin-top: 12px; font-size: 12px; opacity: .75; }
+            html .menu__cta { display: grid; gap: 12px; order: 9; margin-top: 28px; padding-top: 24px; border-top: 1px solid color-mix(in srgb, currentColor 25%, transparent); }
+            .menu__book {
+                display: grid; place-items: center; min-height: 54px;
+                background-color: var(--cream); color: var(--emerald);
+                font-family: var(--f-wide); font-stretch: 125%; font-weight: 800; font-size: 14px; letter-spacing: .08em; text-transform: uppercase;
+            }
+            .menu[data-active="hotel"] .menu__book { color: var(--brown); }
+            .menu__call { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; border: 1.5px solid currentColor; font-family: var(--f-wide); font-size: 14px; letter-spacing: .04em; }
+
+            /* --- Hero: motivele de rezervare și prețul de pornire vizibile din primul ecran --- */
+            .hero__title { font-size: clamp(44px, 12.5vw, 56px); max-width: 11ch; }
+            html .hero__usp {
+                display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 22px;
+                opacity: 0; transform: translateY(10px);
+                transition: opacity .8s var(--ease-out) .15s, transform .9s var(--ease-out) .15s;
+            }
+            body.is-typed .hero__usp { opacity: 1; transform: none; }
+            .hero__usp li {
+                padding: 8px 12px; border: 1px solid rgba(242, 234, 216, .55);
+                background: rgba(3, 31, 23, .38); backdrop-filter: blur(6px);
+                font-family: var(--f-wide); font-size: 12px; letter-spacing: .04em; color: var(--cream);
+            }
+            .hero__usp li:last-child { background: var(--brass); border-color: var(--brass); color: var(--deep); font-weight: 700; }
+
+            /* --- Intro: titlu centrat, text aliniat la stânga (se citește mai ușor pe ecran îngust) --- */
+            .intro { padding-top: 96px; padding-bottom: 260px; }
+            .intro__title { font-size: clamp(38px, 11vw, 48px); }
+            .intro__copy { margin-top: 28px; text-align: left; }
+            .sticker--pol-l { bottom: 40px; }
+            .sticker--ticket { bottom: 56px; }
+
+            /* --- Camere: carusel orizontal în loc de 3.200px de scroll, cu preț și buton „Rezervă” pe fiecare card --- */
+            .rooms { padding: 80px 0 64px; }
+            .rooms__head, .rooms__cta, .rooms__meta { padding: 0 var(--gutter); }
+            .rooms__title { font-size: clamp(40px, 11vw, 52px); margin: 10px 0 14px; }
+            .rooms__grid {
+                display: flex; gap: 14px; margin-top: 32px; padding: 0 var(--gutter) 4px;
+                overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter);
+                overscroll-behavior-x: contain; scrollbar-width: none;
+            }
+            .rooms__grid::-webkit-scrollbar { display: none; }
+            .room { flex: 0 0 84%; scroll-snap-align: start; display: flex; flex-direction: column; }
+            .room__media { aspect-ratio: 4 / 5; cursor: zoom-in; }
+            .room__nav { display: none; }
+            .room__ui { top: 12px; right: 12px; }
+            .room__count, .room__expand { height: 40px; min-width: 40px; font-size: 12px; }
+            .footer__legal { font-size: 12px; }
+            .hero__scroll { padding: 12px 8px; bottom: 84px; white-space: nowrap; }
+            .room__price { white-space: nowrap; }
+            .room__price small:first-child { display: block; margin-bottom: 4px; }
+            .room__info { flex-direction: column; align-items: flex-start; gap: 4px; margin-top: 16px; }
+            .room__meta { display: none; }
+            html .room__size { display: block; }
+            .room__title { font-size: 32px; }
+            .room__desc { margin-top: 8px; font-size: 15px; flex: 1; }
+            html .room__buy { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent); }
+            .room__price { font-family: var(--f-cond); font-size: 30px; line-height: 1; color: var(--brass); }
+            .room__price small { font-family: var(--f-wide); font-size: 12px; letter-spacing: .03em; color: var(--cream); }
+            .room__book {
+                min-height: 46px; padding: 0 20px;
+                background-color: var(--cream); color: var(--brown);
+                font-family: var(--f-wide); font-stretch: 125%; font-weight: 800; font-size: 13px; letter-spacing: .08em; text-transform: uppercase;
+            }
+            html .rooms__meta { display: flex; align-items: center; gap: 14px; margin-top: 22px; }
+            .rooms__bar { position: relative; flex: 1; height: 2px; overflow: hidden; background: color-mix(in srgb, currentColor 25%, transparent); }
+            .rooms__bar span { position: absolute; inset: 0; background: currentColor; transform-origin: left; transform: scaleX(.15); transition: transform .15s linear; }
+            .rooms__cta { margin-top: 36px; }
+            .rooms__cta .btn { width: 100%; }
+
+            /* --- O zi în peninsulă --- */
+            .day { padding: 80px var(--gutter); }
+            .day__title { font-size: clamp(40px, 11vw, 52px); }
+            .day__stage { max-width: 340px; }
+            .day__aside { max-width: none; }
+            .day__aside .btn, .cartier__text .btn { width: 100%; }
+            .hours { margin-top: 64px; }
+            .hours__head h3 { font-size: 20px; }
+            .hours__bar { margin: 20px calc(var(--gutter) * -1) 0; padding: 18px var(--gutter) 4px; scroll-snap-type: x proximity; }
+            .hours__btn { min-height: 44px; padding: 10px 14px; font-size: 13px; scroll-snap-align: center; }
+            .hours__panel { gap: 24px; margin-top: 28px; }
+            .hours__photo { max-width: 240px; }
+            .hours__time { font-size: 64px; }
+
+            /* --- Slider fixat: înălțimea vizibilă reală (fără bara browserului), ca textul să nu fie tăiat --- */
+            .slides__pin { height: 100svh; padding-top: calc(var(--header-h) + 16px); }
+            .slide-text h3 { font-size: clamp(34px, 9.5vw, 44px); margin: 10px 0 14px; }
+            .slide-text .copy { margin-bottom: 14px; font-size: 15px; }
+            .slides__text { min-height: 300px; }
+
+            /* --- Cartier --- */
+            .cartier { padding: 80px 0; }
+            .cartier__script { font-size: clamp(64px, 18vw, 84px); }
+            .drift__item { width: 62vw; }
+            .drift__item:nth-child(3n+1) { margin-top: 40px; }
+            .drift__item:nth-child(3n) { margin-top: 90px; }
+            .cartier__text { margin-top: 64px; }
+            .cartier__text h2 { font-size: clamp(34px, 9.5vw, 44px); }
+
+            /* --- Footer: contact dintr-o atingere + linkuri ușor de apăsat --- */
+            .footer__logo { font-size: 25vw; }
+            html .quick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 40px; }
+            .quick__btn {
+                display: grid; justify-items: center; gap: 6px; padding: 14px 6px;
+                border: 1.5px solid color-mix(in srgb, var(--cream) 45%, transparent);
+                font-family: var(--f-wide); font-size: 13px; letter-spacing: .04em;
+            }
+            .quick__btn .icon { width: 20px; height: 20px; }
+            .quick__btn.gloss { background-color: var(--emerald); border-color: var(--emerald); }
+            .footer__grid { gap: 28px; }
+            .footer__grid li + li { margin-top: 0; }
+            .footer__grid li a, .footer__grid li button { display: inline-block; padding: 10px 0; }
+
+            /* --- Bara de jos: și partea de promoție are minimum 48px --- */
+            .mfinder__part { min-width: 48px; justify-content: center; }
+            .mfinder__dates { justify-content: flex-start; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; transition-delay: 0s !important; }
+            html { scroll-behavior: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= LOADER ================= -->
+    <div class="loader" aria-hidden="true">
+        <span class="loader__logo t-script">Vila Pontica</span>
+        <span class="loader__line"></span>
+    </div>
+
+    <!-- ================= HEADER ================= -->
+    <header class="header">
+        <div class="header__left">
+            <a class="icon-btn" href="tel:+40241890112" aria-label="Sună la recepție">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
+            </a>
+            <a class="icon-btn" href="#contact" aria-label="Unde ne găsești">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            </a>
+            <button class="lang menu-toggle" type="button" data-menu-toggle aria-label="Deschide meniul">
+                Meniu
+            </button>
+        </div>
+
+        <nav class="header__nav" aria-label="Navigare principală">
+            <button class="navbtn" type="button" data-menu="cartier" aria-expanded="false" aria-controls="menu">
+                Cartier <svg class="icon" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <a class="logo" href="#top" aria-label="Vila Pontica — începutul paginii">Vila Pontica</a>
+            <button class="navbtn" type="button" data-menu="hotel" aria-expanded="false" aria-controls="menu">
+                Hotel <svg class="icon" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+        </nav>
+
+        <div class="header__right">
+            <a class="icon-btn header__call m-only" href="tel:+40241890112" aria-label="Sună la recepție">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
+            </a>
+            <button class="lang" type="button" aria-label="Limba: română">
+                RO <svg class="icon" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <button class="lang header__close" type="button" data-menu-close>Închide</button>
+        </div>
+    </header>
+
+    <!-- ================= BADGE REZERVĂ ================= -->
+    <a class="badge" href="#top" data-book aria-label="Rezervă acum">
+        <svg class="badge__ring" viewBox="0 0 120 120" aria-hidden="true">
+            <defs><path id="badgePath" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0"/></defs>
+            <circle cx="60" cy="60" r="58"/>
+            <text><textPath href="#badgePath" textLength="280" lengthAdjust="spacing">REZERVĂ ACUM · REZERVĂ ACUM · </textPath></text>
+        </svg>
+        <span class="badge__icon" aria-hidden="true">
+            <svg class="icon is-on" viewBox="0 0 24 24"><circle cx="12" cy="7" r="2.6"/><path d="M2 14c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 19c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/></svg>
+            <span class="badge__vp">VP</span>
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="M12 7v14M5 13a7 7 0 0 0 14 0M8 10h8"/></svg>
+        </span>
+    </a>
+
+    <!-- ================= MENIU CARTIER / HOTEL ================= -->
+    <div class="menu" id="menu" data-active="cartier" aria-hidden="true">
+        <div class="menu__tabs" role="tablist" aria-label="Secțiuni meniu">
+            <button type="button" role="tab" data-menu-switch="cartier" aria-selected="true"><span>Cartier</span></button>
+            <button type="button" role="tab" data-menu-switch="hotel" aria-selected="false"><span>Hotel</span></button>
+        </div>
+
+        <div class="menu__col menu__col--cartier">
+            <button class="menu__title t-wide" type="button" data-menu-switch="cartier">Cartier</button>
+            <ul class="menu__list">
+                <li class="menu__item" style="--i:0"><a class="menu__link" href="#peninsula">Peninsula</a></li>
+                <li class="menu__item" style="--i:1"><a class="menu__link" href="#peninsula">Istorie</a></li>
+                <li class="menu__item" style="--i:2"><span class="menu__sub">Mănâncă</span><a class="menu__link" href="#gust" data-slide="0">Bucătăria Pontica</a></li>
+                <li class="menu__item" style="--i:3"><span class="menu__sub">Trăiește</span><a class="menu__link" href="#o-zi">Agenda cartierului</a><br><a class="menu__link" href="#gust" data-slide="2">Spa</a></li>
+                <li class="menu__item" style="--i:4"><span class="menu__sub">Bea</span><a class="menu__link" href="#gust" data-slide="1">Terasa de pe acoperiș</a><br><a class="menu__link" href="#gust" data-slide="2">Clubul ◆◆</a></li>
+            </ul>
+        </div>
+
+        <div class="menu__center" aria-hidden="true">
+            <div class="menu__photo">
+                <figure class="pol pol--cartier"><img src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=700&q=75" alt=""></figure>
+                <figure class="pol pol--hotel"><img src="https://images.unsplash.com/photo-1455587734955-081b22074882?auto=format&fit=crop&w=700&q=75" alt=""></figure>
+            </div>
+            <svg class="menu__badge" viewBox="0 0 120 120">
+                <defs><path id="menuBadgePath" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0"/></defs>
+                <circle cx="60" cy="60" r="58"/><circle cx="60" cy="60" r="32"/>
+                <text><textPath href="#menuBadgePath" textLength="280" lengthAdjust="spacing">REZERVĂ ACUM · REZERVĂ ACUM · </textPath></text>
+                <text x="60" y="70" text-anchor="middle" style="font-family:var(--f-script);font-size:30px;font-stretch:100%;letter-spacing:0;font-weight:400">VP</text>
+            </svg>
+        </div>
+
+        <div class="menu__col menu__col--hotel">
+            <button class="menu__title t-wide" type="button" data-menu-switch="hotel">Hotel</button>
+            <ul class="menu__list">
+                <li class="menu__item" style="--i:0"><a class="menu__link" href="#peninsula">Hotelul</a></li>
+                <li class="menu__item" style="--i:1"><a class="menu__link" href="#camere">Camere</a></li>
+                <li class="menu__item" style="--i:2"><a class="menu__link" href="#camere">Oferte</a></li>
+                <li class="menu__item" style="--i:3"><a class="menu__link" href="#cartier">Oaspeții noștri</a></li>
+                <li class="menu__item" style="--i:4"><a class="menu__link" href="#gust">Servicii</a></li>
+                <li class="menu__item" style="--i:5"><a class="menu__link" href="#o-zi">24 de ore la Vila</a></li>
+            </ul>
+        </div>
+
+        <!-- Doar pe mobil: meniul ascunde bara de rezervare, deci îi oferim aici acțiunile principale -->
+        <div class="menu__cta m-only">
+            <a class="menu__book gloss gloss--auto" href="#top" data-book>Rezervă acum</a>
+            <a class="menu__call" href="tel:+40241890112">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
+                +40 241 890 112
+            </a>
+        </div>
+    </div>
+
+    <main id="top">
+        <!-- ================= HERO + INTRO (efectul de "rotire") ================= -->
+        <div class="hero-stage">
+            <section class="hero s-smarald" data-scheme aria-label="Vila Pontica">
+                <div class="hero__frame">
+                    <video class="hero__media" autoplay loop muted playsinline
+                           poster="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1920&q=80">
+                        <source src="https://assets.mixkit.co/videos/1090/1090-720.mp4" type="video/mp4">
+                    </video>
+                    <div class="hero__shade"></div>
+
+                    <div class="hero__content">
+                        <h1 class="hero__title t-cond" data-type="Un hotel cu suflet de peninsulă">
+                            <span class="hero__typed"></span><span class="hero__cursor" aria-hidden="true"></span>
+                            <span class="sr-only">Un hotel cu suflet de peninsulă</span>
+                        </h1>
+                        <!-- Doar pe mobil: motivele de rezervare vizibile din primul ecran -->
+                        <ul class="hero__usp m-only" aria-label="Pe scurt">
+                            <li>Doar 8 camere</li>
+                            <li>Casă din 1928</li>
+                            <li>De la 120 € / noapte</li>
+                        </ul>
+
+                        <!-- Bara de rezervare -->
+                        <form class="finder" id="rezerva" autocomplete="off" onsubmit="return false">
+                            <div class="finder__field" role="button" tabindex="0" data-pop="dates" aria-haspopup="dialog" aria-expanded="false">
+                                <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                                <span><span class="finder__label">Când</span><span class="finder__value" data-out="dates">Check-in — Check-out</span></span>
+                                <div class="pop" data-popover="dates" role="dialog" aria-label="Alege datele">
+                                    <div class="pop__row"><label for="checkin">Check-in</label><input id="checkin" type="date" data-date="in"></div>
+                                    <div class="pop__row"><label for="checkout">Check-out</label><input id="checkout" type="date" data-date="out"></div>
+                                    <p class="pop__note" data-out="nights"></p>
+                                </div>
+                            </div>
+                            <div class="finder__field" role="button" tabindex="0" data-pop="guests" aria-haspopup="dialog" aria-expanded="false">
+                                <svg class="icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 4.5a3 3 0 0 1 0 6M18 14c2 .8 3 2.8 3 6"/></svg>
+                                <span><span class="finder__label">Cine</span><span class="finder__value" data-out="guests">2 adulți · 1 cameră</span></span>
+                                <div class="pop" data-popover="guests" role="dialog" aria-label="Alege oaspeții">
+                                    <div class="pop__row"><span>Adulți</span><div class="stepper" data-stepper="adults" data-min="1" data-max="6"><button type="button" data-step="-1" aria-label="Mai puțini adulți">−</button><output>2</output><button type="button" data-step="1" aria-label="Mai mulți adulți">+</button></div></div>
+                                    <div class="pop__row"><span>Copii</span><div class="stepper" data-stepper="children" data-min="0" data-max="4"><button type="button" data-step="-1" aria-label="Mai puțini copii">−</button><output>0</output><button type="button" data-step="1" aria-label="Mai mulți copii">+</button></div></div>
+                                    <div class="pop__row"><span>Camere</span><div class="stepper" data-stepper="rooms" data-min="1" data-max="4"><button type="button" data-step="-1" aria-label="Mai puține camere">−</button><output>1</output><button type="button" data-step="1" aria-label="Mai multe camere">+</button></div></div>
+                                </div>
+                            </div>
+                            <label class="finder__field">
+                                <svg class="icon" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/></svg>
+                                <span><span class="finder__label">Promoție</span><input class="finder__value" type="text" placeholder="Cod" aria-label="Cod promoțional" data-promo></span>
+                            </label>
+                            <button class="finder__submit gloss gloss--auto" type="button" data-search>Caută</button>
+                        </form>
+                    </div>
+
+                    <button class="hero__scroll t-label" type="button" data-scroll-next>
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 4v16M5 13l7 7 7-7"/></svg>
+                        Scroll ca să descoperi Vila
+                    </button>
+                </div>
+            </section>
+
+            <section class="intro s-smarald" id="peninsula" data-scheme>
+                <p class="intro__script t-script" aria-hidden="true">Așa e aici</p>
+
+                <!-- Stickere decorative cu parallax -->
+                <div class="sticker sticker--stamp" data-speed="-0.12" data-rot="-12" aria-hidden="true">
+                    <div class="stamp">
+                        <svg viewBox="0 0 140 140">
+                            <defs><path id="stampPath" d="M70,70 m-52,0 a52,52 0 1,1 104,0 a52,52 0 1,1 -104,0"/></defs>
+                            <circle cx="70" cy="70" r="66" stroke-width="2"/>
+                            <circle cx="70" cy="70" r="38" stroke-width="1.5" stroke-dasharray="3 4"/>
+                            <text><textPath href="#stampPath" textLength="322" lengthAdjust="spacing">CONSTANȚA · PENINSULA · EST. 1928 · </textPath></text>
+                            <text class="stamp__vp" x="70" y="83" text-anchor="middle">VP</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="sticker sticker--ticket" data-speed="0.16" data-rot="9" aria-hidden="true">
+                    <div class="ticket gloss">
+                        <div class="ticket__top"><span>BILET</span><span>Nº 1928</span></div>
+                        <span class="ticket__name">Vila Pontica</span>
+                        <div class="ticket__line"></div>
+                        <div class="ticket__bottom">ADMIS · O VARĂ ÎNTREAGĂ</div>
+                    </div>
+                </div>
+                <figure class="sticker sticker--pol-l pol" data-speed="0.1" data-rot="-8" aria-hidden="true">
+                    <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=500&q=75" alt="" loading="lazy">
+                    <figcaption>faleza, 8:30</figcaption>
+                </figure>
+                <figure class="sticker sticker--pol-r pol" data-speed="-0.08" data-rot="7" aria-hidden="true">
+                    <img src="https://images.unsplash.com/photo-1517840901100-8179e982acb7?auto=format&fit=crop&w=500&q=75" alt="" loading="lazy">
+                    <figcaption>noapte bună</figcaption>
+                </figure>
+
+                <h2 class="intro__title t-cond" data-reveal>La noi, marea este vecina de palier.</h2>
+                <div class="intro__copy" data-reveal style="--d:120ms">
+                    <p class="copy">Peninsula Constanței are ceva ce nu se explică, se simte. Străzi înguste cu case de negustori, moscheea și catedrala la doi pași una de alta, Cazinoul care privește spre larg de peste o sută de ani. Aici își petreceau verile familiile vechi ale orașului și artiștii veniți de departe.</p>
+                    <p class="copy">Azi, peninsula e înainte de toate un cartier. Iar Vila Pontica, o casă din 1928 cu doar opt camere, e felul nostru de a-i spune mulțumesc.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================= CAMERE ================= -->
+        <section class="rooms s-maro" id="camere" data-scheme>
+            <div class="wrap">
+                <div class="rooms__head" data-reveal>
+                    <span class="t-label">Camerele noastre</span>
+                    <h2 class="rooms__title t-cond">Un loc doar al tău</h2>
+                    <p class="copy">Nu e ușor să te simți ca acasă. Totul începe cu o cameră care pare că te aștepta. Opt camere, fiecare cu povestea ei: tavane înalte, calcar dobrogean, in organic și ferestre care se deschid spre briza sărată.</p>
+                </div>
+                <div class="rooms__grid" data-rooms></div>
+                <!-- Doar pe mobil: camerele devin un carusel orizontal; arătăm unde ești și că mai sunt -->
+                <div class="rooms__meta m-only" aria-hidden="true">
+                    <span class="t-label" data-rooms-count>1 / 6</span>
+                    <span class="rooms__bar"><span data-rooms-bar></span></span>
+                    <span class="t-label">Glisează →</span>
+                </div>
+                <div class="rooms__cta"><a class="btn" href="#top" data-book>Verifică disponibilitatea</a></div>
+            </div>
+        </section>
+
+        <!-- ================= O ZI ÎN PENINSULĂ ================= -->
+        <section class="day s-adanc" id="o-zi" data-scheme>
+            <div class="wrap">
+                <div class="day__grid">
+                    <div class="day__intro" data-reveal>
+                        <span class="t-label">Trăiește ca un localnic</span>
+                        <h2 class="day__title t-cond">O zi în peninsulă</h2>
+                    </div>
+
+                    <div class="day__stage">
+                        <svg class="day__ring" viewBox="0 0 600 600" aria-hidden="true">
+                            <defs><path id="dayPath" d="M300,300 m-262,0 a262,262 0 1,1 524,0 a262,262 0 1,1 -524,0"/></defs>
+                            <text><textPath href="#dayPath" textLength="1640" lengthAdjust="spacing">24 DE ORE LA VILA PONTICA + VIAȚA DE CARTIER CARE TE AȘTEAPTĂ + 24 DE ORE LA VILA PONTICA + VIAȚA DE CARTIER CARE TE AȘTEAPTĂ + </textPath></text>
+                        </svg>
+                        <div class="day__stack" data-stack>
+                            <div class="day__card" data-start="-3" data-end="-1"><figure class="pol"><img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=700&q=75" alt="Cafea de dimineață" loading="lazy"></figure></div>
+                            <div class="day__card" data-start="4" data-end="2"><figure class="pol"><img src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=700&q=75" alt="Valuri pe stânci la apus" loading="lazy"></figure></div>
+                            <div class="day__card" data-start="-4" data-end="-2"><figure class="pol"><img src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=700&q=75" alt="Pahare de vin ciocnite" loading="lazy"></figure></div>
+                            <div class="day__card" data-start="3" data-end="1"><figure class="pol"><img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=700&q=75" alt="Prieteni la apus" loading="lazy"></figure></div>
+                        </div>
+                    </div>
+
+                    <div class="day__aside" data-reveal style="--d:150ms">
+                        <p class="copy">Vecinii se nasc sau se fac? Uite cum arată o zi obișnuită în peninsulă: idei gândite ca să te simți de-al locului încă dinainte să ajungi.</p>
+                        <a class="btn" href="#ore">O zi în cartier</a>
+                    </div>
+                </div>
+
+                <!-- Cronologia de 24 de ore -->
+                <div class="hours" id="ore" data-hours>
+                    <div class="hours__head">
+                        <h3 class="t-wide">Descoperă 24 de ore în cartier</h3>
+                    </div>
+                    <div class="hours__bar" role="tablist" aria-label="Orele zilei"><span class="hours__fill"></span></div>
+                    <div class="hours__panel" role="tabpanel" aria-live="polite">
+                        <div class="hours__photo"><figure class="pol"><img data-h="img" src="" alt=""></figure></div>
+                        <div>
+                            <p class="hours__time t-cond" data-h="time"></p>
+                            <h4 class="hours__name t-wide" data-h="title"></h4>
+                            <p class="hours__text copy" data-h="text"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= GUST: SLIDER FIXAT ================= -->
+        <section class="slides s-maro" id="gust" data-scheme data-slides>
+            <div class="slides__pin">
+                <div class="slides__progress" aria-hidden="true"><span></span></div>
+                <div class="slides__media">
+                    <div class="slides__track">
+                        <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=1400&q=80" alt="Bucătar care pregătește ierburi proaspete" loading="lazy">
+                        <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1400&q=80" alt="Terasă cu mese deasupra mării" loading="lazy">
+                        <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1400&q=80" alt="Prosoape și ulei aromat în spa" loading="lazy">
+                    </div>
+                </div>
+                <div class="slides__text">
+                    <article class="slide-text is-active">
+                        <span class="t-label">Mănâncă</span>
+                        <h3 class="t-cond">Mâncare fără filtru</h3>
+                        <p class="copy">Bucătăria Pontica gătește ce aduc în dimineața aceea pescarii din port și grădinarii din satele Dobrogei. Fără artificii, cu foc deschis și mult gust.</p>
+                        <a class="link" href="#o-zi">Vezi mai mult</a>
+                    </article>
+                    <article class="slide-text">
+                        <span class="t-label">Bea</span>
+                        <h3 class="t-cond">Pe acoperiș, cu marea în pahar</h3>
+                        <p class="copy">Aici o pauză înseamnă un pahar cu prietenii. Iar dacă tot te oprești, urcă pe terasă: soare, vinuri dobrogene și vedere spre port și Cazinou.</p>
+                        <a class="link" href="#o-zi">Vezi mai mult</a>
+                    </article>
+                    <article class="slide-text">
+                        <span class="t-label">Trăiește</span>
+                        <h3 class="t-cond">Film, dans sau liniște deplină</h3>
+                        <p class="copy">Ca și peninsula, Vila se trăiește în multe feluri: un film în cinematograful de la subsol, o seară de dans la Club sau doar spa-ul cu piatră caldă.</p>
+                        <a class="link" href="#o-zi">Vezi mai mult</a>
+                    </article>
+                </div>
+                <span class="slides__count t-label" aria-hidden="true">01 / 03</span>
+            </div>
+        </section>
+
+        <!-- ================= CARTIER ================= -->
+        <section class="cartier s-smarald" id="cartier" data-scheme>
+            <h2 class="cartier__script t-script" data-reveal><span>Bun venit</span><span>în Peninsulă</span></h2>
+            <div class="drift" data-drift aria-label="Imagini din cartier">
+                <div class="drift__track"></div>
+            </div>
+            <div class="cartier__text" data-reveal>
+                <h2 class="t-cond">Cartierul nu se vizitează. Se locuiește.</h2>
+                <p class="copy">Un cartier are sens doar dacă îl construiești împreună cu cei din jur. Lucrăm cu brutarii, pescarii și meșterii din peninsulă, reparăm în loc să înlocuim și ne dorim ca fiecare oaspete să plece cu un vecin în plus.</p>
+                <a class="btn" href="#o-zi">Explorează peninsula</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="footer s-smarald" id="contact" data-scheme>
+        <p class="footer__logo t-script" aria-hidden="true">Vila Pontica</p>
+        <div class="footer__base">
+            <div class="wrap">
+                <!-- Doar pe mobil: contact dintr-o atingere -->
+                <div class="quick m-only">
+                    <a class="quick__btn gloss" href="tel:+40241890112">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Sună
+                    </a>
+                    <a class="quick__btn" href="mailto:concierge@vilapontica.ro">
+                        <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 7l9 6 9-6"/></svg>Scrie-ne
+                    </a>
+                    <a class="quick__btn" href="https://www.google.com/maps/search/?api=1&amp;query=Strada%20Cristea%20Georgescu%2012%20Constan%C8%9Ba" target="_blank" rel="noopener">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Hartă
+                    </a>
+                </div>
+                <div class="footer__grid">
+                    <div class="footer__address copy">
+                        <p>Strada Cristea Georgescu Nr. 12<br>Zona Peninsulară, Constanța 900745, România</p>
+                        <p style="margin-top:14px">+40 241 890 112<br>concierge@vilapontica.ro</p>
+                        <a class="link" href="mailto:concierge@vilapontica.ro">Contact</a>
+                    </div>
+                    <div>
+                        <h4 class="t-wide">Vila Pontica</h4>
+                        <ul class="copy">
+                            <li><button type="button" data-menu-open="cartier">Cartier</button></li>
+                            <li><button type="button" data-menu-open="hotel">Hotel</button></li>
+                            <li><a href="#camere">Camere</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="t-wide">Urmărește</h4>
+                        <ul class="copy">
+                            <li><a href="#contact">Instagram</a></li>
+                            <li><a href="#contact">Facebook</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="t-wide">Legal</h4>
+                        <ul class="copy">
+                            <li><a href="#contact">Termeni și condiții</a></li>
+                            <li><a href="#contact">Confidențialitate</a></li>
+                            <li><a href="#contact">Cookie-uri</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer__legal t-label">
+                    <span>Vila Pontica · Peninsula Constanța · Est. 1928</span>
+                    <span>Concept design 2026</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================= LIGHTBOX ================= -->
+    <div class="lightbox" role="dialog" aria-modal="true" aria-label="Galerie cameră" aria-hidden="true">
+        <div class="lightbox__top">
+            <h2 class="lightbox__title t-cond" data-lb="title"></h2>
+            <button class="icon-btn" type="button" data-lb-close aria-label="Închide galeria">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+        </div>
+        <div class="lightbox__stage"><img data-lb="img" src="" alt=""></div>
+        <div class="lightbox__bottom">
+            <button class="icon-btn" type="button" data-lb-step="-1" aria-label="Imaginea anterioară"><svg class="icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <span class="t-label" data-lb="count"></span>
+            <button class="icon-btn" type="button" data-lb-step="1" aria-label="Imaginea următoare"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+    </div>
+
+    <!-- ================= REZERVARE PE MOBIL: BARĂ FIXĂ JOS + PANOU ================= -->
+    <div class="mfinder" role="group" aria-label="Rezervare rapidă">
+        <button class="mfinder__part mfinder__dates" type="button" data-sheet="dates" aria-label="Alege datele">
+            <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+            <span data-out="dates"></span>
+        </button>
+        <button class="mfinder__part" type="button" data-sheet="guests" aria-label="Alege oaspeții">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 4.5a3 3 0 0 1 0 6M18 14c2 .8 3 2.8 3 6"/></svg>
+            <span data-out="guests-count">2</span>
+        </button>
+        <button class="mfinder__part" type="button" data-sheet="promo" aria-label="Cod promoțional">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/></svg>
+        </button>
+        <button class="mfinder__go gloss gloss--auto" type="button" data-search aria-label="Caută disponibilitate">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+        </button>
+    </div>
+
+    <div class="sheet" aria-hidden="true">
+        <div class="sheet__backdrop" data-sheet-close></div>
+        <div class="sheet__panel" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+            <div class="sheet__grab" data-sheet-grab>
+                <span class="sheet__handle" aria-hidden="true"></span>
+                <div class="sheet__head">
+                    <h2 class="t-wide" id="sheetTitle">Rezervă</h2>
+                    <button class="icon-btn" type="button" data-sheet-close aria-label="Închide panoul de rezervare">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sheet__group" data-group="dates">
+                <span class="t-label">Când</span>
+                <div class="sheet__dates">
+                    <label>Check-in<input type="date" data-date="in"></label>
+                    <label>Check-out<input type="date" data-date="out"></label>
+                </div>
+                <p class="sheet__note" data-out="nights"></p>
+            </div>
+            <div class="sheet__group" data-group="guests">
+                <span class="t-label">Cine</span>
+                <div class="pop__row"><span>Adulți</span><div class="stepper" data-stepper="adults" data-min="1" data-max="6"><button type="button" data-step="-1" aria-label="Mai puțini adulți">−</button><output>2</output><button type="button" data-step="1" aria-label="Mai mulți adulți">+</button></div></div>
+                <div class="pop__row"><span>Copii</span><div class="stepper" data-stepper="children" data-min="0" data-max="4"><button type="button" data-step="-1" aria-label="Mai puțini copii">−</button><output>0</output><button type="button" data-step="1" aria-label="Mai mulți copii">+</button></div></div>
+                <div class="pop__row"><span>Camere</span><div class="stepper" data-stepper="rooms" data-min="1" data-max="4"><button type="button" data-step="-1" aria-label="Mai puține camere">−</button><output>1</output><button type="button" data-step="1" aria-label="Mai multe camere">+</button></div></div>
+            </div>
+            <div class="sheet__group" data-group="promo">
+                <label class="t-label" for="m-promo">Promoție</label>
+                <input class="sheet__input" id="m-promo" type="text" placeholder="Cod promoțional" autocomplete="off" data-promo>
+            </div>
+            <button class="sheet__submit gloss gloss--auto" type="button" data-search>Caută disponibilitate</button>
+        </div>
+    </div>
+
+    <div class="toast gloss" role="status" aria-live="polite"></div>
+
+    <!-- ================= SCRIPT ================= -->
+    <script>
+    (() => {
+        'use strict';
+
+        const $ = (s, c = document) => c.querySelector(s);
+        const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
+        const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+        const easeInOut = v => v < .5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2;
+        const easeOut = v => 1 - Math.pow(1 - v, 3);
+        const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const mqMobile = matchMedia('(max-width: 767px)');
+        const img = (id, w = 1200) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
+        const root = document.documentElement;
+        const body = document.body;
+
+        const ICON = {
+            left: '<svg class="icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>',
+            right: '<svg class="icon" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>',
+            expand: '<svg class="icon" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>'
+        };
+
+        // ================= DATE =================
+        const ROOMS = [
+            { name: 'Suita Faleză', size: '34 m²', price: 190, desc: 'Balcon din fier forjat cu vedere spre Cazinou. Dimineața, lumina intră direct pe pat.', imgs: ['1501117716987-c8c394bb29df', '1598928506311-c55ded91a20c', '1540518614846-7eded433c457'] },
+            { name: 'Camera Grădină', size: '28 m²', price: 150, desc: 'Terasă privată spre curtea interioară cu smochini. Cea mai liniștită cameră din casă.', imgs: ['1616594039964-ae9021a400a0', '1631049307264-da0ec9d70304', '1513694203232-719a280e022f'] },
+            { name: 'Mansarda Far', size: '52 m²', price: 260, desc: 'Sub acoperiș, cu luminator deasupra patului și terasă panoramică spre larg.', imgs: ['1590490360182-c33d57733427', '1505693416388-ac5ce068fe85', '1493809842364-78817add7ffb'] },
+            { name: 'Camera Cazinou', size: '30 m²', price: 170, desc: 'Ferestre înalte, tavan cu stucaturi din 1928 și marea la colțul străzii.', imgs: ['1618773928121-c32242e63f39', '1522771739844-6a9f6d5f14af'] },
+            { name: 'Dubla Pescăruș', size: '22 m²', price: 120, desc: 'Mică, caldă și luminoasă. Pentru cei care vin la Constanța ca să stea afară.', imgs: ['1611892440504-42a792e24d32', '1595576508898-0ad5c879a061'] },
+            { name: 'Suita Ovidiu', size: '46 m²', price: 230, desc: 'Cadă din travertin, dressing și o terasă unde micul dejun durează cât vrei tu.', imgs: ['1496417263034-38ec4f0b665a', '1540555700478-4be289fbecef'] }
+        ];
+
+        const HOURS = [
+            { h: '08:30', t: 'Mic dejun fără grabă', d: 'Pâine cu maia scoasă din cuptor, brânzeturi maturate din satele dobrogene și miere de tei. Se servește până la prânz.', img: '1533089860892-a7c6f0a88666' },
+            { h: '10:30', t: 'O baie rapidă în mare', d: 'Plaja Modern e la câteva minute pe jos. Prosoapele și umbrela te așteaptă la recepție.', img: '1473116763249-2faaef81ccda' },
+            { h: '12:30', t: 'Cafea pe faleză', d: 'Cu Cazinoul în spate și pescărușii pe balustradă. Îți spunem noi unde se face cea mai bună.', img: '1509042239860-f550ce710b93' },
+            { h: '14:00', t: 'Pește proaspăt la prânz', d: 'Ce au adus pescarii dimineața, gătit simplu. Restul e vorbă lungă.', img: '1504674900247-0877df9cc836' },
+            { h: '16:00', t: 'Siesta', d: 'Obloanele trase, briza prin ferestrele înalte. Orașul încetinește, și tu odată cu el.', img: '1522771739844-6a9f6d5f14af' },
+            { h: '18:30', t: 'Plimbare prin peninsulă', d: 'Moscheea, catedrala, Farul Genovez și străduțele dintre ele. Toate la o plimbare distanță.', img: '1529156069898-49953e39b3ac' },
+            { h: '20:00', t: 'Aperitiv pe acoperiș', d: 'Vinuri dobrogene, apusul peste port și cine se nimerește la masa de alături.', img: '1506377247377-2a5b3b417ebb' },
+            { h: '22:00', t: 'Cina', d: 'Bucătăria Pontica gătește pe foc deschis. Rezervă din timp: avem doar paisprezece mese.', img: '1414235077428-338989a2e8c0' },
+            { h: '23:30', t: 'Noaptea începe aici', d: 'Barul de la parter rămâne deschis cât timp mai are cineva o poveste de spus.', img: '1514362545857-3bc16c4c7d1b' }
+        ];
+
+        const DRIFT = [
+            ['1455587734955-081b22074882', 'Fațadă albă cu balcoane'],
+            ['1500375592092-40eb2168fd21', 'Valuri pe stânci'],
+            ['1529156069898-49953e39b3ac', 'Prieteni pe un zid, privind orașul'],
+            ['1506377247377-2a5b3b417ebb', 'Pahar de vin cu podgorii și mare în fundal'],
+            ['1517840901100-8179e982acb7', 'Semn luminos de hotel noaptea'],
+            ['1495474472287-4d71bcdd2085', 'Cafele ținute în mâini'],
+            ['1559827260-dc66d52bef19', 'Val la apus'],
+            ['1510812431401-41d2bd2722f3', 'Pahare ciocnite'],
+            ['1600585154340-be6161a56a0c', 'Casă albă modernă']
+        ];
+
+        // ================= TOAST =================
+        const toastEl = $('.toast');
+        function toast(msg) {
+            toastEl.textContent = msg;
+            toastEl.classList.add('is-on');
+            clearTimeout(toastEl._t);
+            toastEl._t = setTimeout(() => toastEl.classList.remove('is-on'), 4600);
+        }
+
+        // ================= LOADER + TYPEWRITER =================
+        const typedEl = $('.hero__typed');
+        const fullTitle = $('.hero__title').dataset.type;
+        function typeTitle() {
+            if (reduced) { typedEl.textContent = fullTitle; body.classList.add('is-typed'); return; }
+            let i = 0;
+            const tick = () => {
+                typedEl.textContent = fullTitle.slice(0, ++i);
+                // pe mobil mesajul trebuie citit repede: tastăm mai rapid
+                const fast = mqMobile.matches;
+                if (i < fullTitle.length) setTimeout(tick, fullTitle[i - 1] === ' ' ? (fast ? 50 : 90) : (fast ? 26 : 48));
+                else body.classList.add('is-typed');
+            };
+            setTimeout(tick, 500);
+        }
+        function finishLoading() {
+            if (body.classList.contains('is-loaded')) return;
+            body.classList.add('is-loaded');
+            typeTitle();
+        }
+        window.addEventListener('load', () => setTimeout(finishLoading, 500));
+        setTimeout(finishLoading, 3200);
+
+        // ================= CULORI SINCRONIZATE CU SCROLL-UL =================
+        // Fundalul paginii trece lin dintr-o schemă în alta (probă la 45% din înălțime).
+        const parseColor = c => {
+            c = (c || '').trim();
+            if (c[0] === '#') {
+                let h = c.slice(1);
+                if (h.length === 3) h = [...h].map(x => x + x).join('');
+                return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16));
+            }
+            const m = c.match(/[\d.]+/g);
+            return m ? m.slice(0, 3).map(Number) : null;
+        };
+        const mixColor = (a, b, p) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * p)).join(', ')})`;
+        const schemes = $$('[data-scheme]').map(el => {
+            const cs = getComputedStyle(el);
+            return {
+                el,
+                bg: parseColor(cs.getPropertyValue('--s-bg')),
+                fg: parseColor(cs.getPropertyValue('--s-color')),
+                alt: parseColor(cs.getPropertyValue('--s-alt'))
+            };
+        });
+        const themeMeta = $('meta[name="theme-color"]');
+        let lastBg = '';
+        function updateColors(vh) {
+            const probe = vh * .45;
+            let i = 0;
+            schemes.forEach((m, k) => { if (m.el.getBoundingClientRect().top <= probe) i = k; });
+            const cur = schemes[i], next = schemes[i + 1];
+            let p = 0;
+            if (next) {
+                const top = next.el.getBoundingClientRect().top;
+                p = easeInOut(clamp((vh - top) / Math.max(vh - probe, 1), 0, 1));
+            }
+            const pick = k => next ? mixColor(cur[k], next[k], p) : mixColor(cur[k], cur[k], 0);
+            const bg = pick('bg');
+            if (bg !== lastBg) {
+                lastBg = bg;
+                root.style.setProperty('--active-bg', bg);
+                root.style.setProperty('--active-color', pick('fg'));
+                root.style.setProperty('--active-alt', pick('alt'));
+                themeMeta.setAttribute('content', bg);
+            }
+        }
+
+        // ================= HERO: MICȘORARE + BLUR, INTRO URCĂ PESTE =================
+        const stage = $('.hero-stage');
+        const heroFrame = $('.hero__frame');
+        const intro = $('.intro');
+        let lastHero = -1;
+        function updateHero(vh) {
+            if (reduced) return;
+            // offsetTop ignoră transformările, deci măsurăm poziția „naturală” a intro-ului
+            const top = stage.offsetTop + intro.offsetTop - window.scrollY;
+            const raw = clamp((vh * .96 - top) / (vh * .96 - vh * .26), 0, 1);
+            const e = easeInOut(raw);
+            const rp = easeInOut(clamp((e - .1) / .9, 0, 1));
+            const cp = easeOut(clamp((e - .01) / .91, 0, 1));
+            if (Math.abs(e - lastHero) < .0005) return;
+            lastHero = e;
+            heroFrame.style.transform = `translate3d(0, ${(rp * 58).toFixed(2)}px, 0) scale(${(1 - rp * .38).toFixed(4)})`;
+            // pe telefoane un blur mare peste video sacadează scroll-ul, așa că îl reducem
+            const blurMax = mqMobile.matches ? 6 : 18;
+            heroFrame.style.filter = rp > .002 ? `blur(${(rp * blurMax).toFixed(2)}px) saturate(${(1 - rp * .22).toFixed(3)})` : 'none';
+            heroFrame.style.opacity = (1 - rp * .34).toFixed(3);
+            // fără transform la final, ca luciul fixat de ecran (background-attachment: fixed) să se lege fără cusătură
+            intro.style.transform = cp > .999 ? 'none' : `translate3d(0, ${((1 - cp) * 168).toFixed(2)}px, 0) scale(${(.952 + cp * .048).toFixed(4)})`;
+            intro.style.boxShadow = `0 -30px 70px rgba(0, 38, 29, ${(cp * .3).toFixed(3)})`;
+        }
+
+        // ================= PARALLAX STICKERE =================
+        const stickers = $$('[data-speed]');
+        function updateParallax(vh) {
+            if (reduced) return;
+            const r = intro.getBoundingClientRect();
+            if (r.bottom < -200 || r.top > vh + 200) return;
+            // pe ecrane mici mișcarea e redusă, ca stickerele să rămână în fâșia lor
+            const d = (r.top + r.height / 2 - vh / 2) * (window.innerWidth < 768 ? .3 : 1);
+            stickers.forEach(el => {
+                const s = parseFloat(el.dataset.speed);
+                const rot = parseFloat(el.dataset.rot || 0);
+                el.style.transform = `translate3d(0, ${(d * s).toFixed(1)}px, 0) rotate(${(rot + d * s * .025).toFixed(2)}deg)`;
+            });
+        }
+
+        // ================= SLIDER FIXAT (avansează cu scroll-ul) =================
+        const slides = $('[data-slides]');
+        const slideTexts = $$('.slide-text', slides);
+        const slideTrack = $('.slides__track', slides);
+        const slideCount = $('.slides__count', slides);
+        const nSlides = slideTexts.length;
+        slides.style.setProperty('--n', nSlides);
+        let slideIdx = -1;
+        function updateSlides(vh) {
+            const r = slides.getBoundingClientRect();
+            if (r.bottom < 0 || r.top > vh) return;
+            const inside = Math.max(0, -r.top);
+            slides.style.setProperty('--p', clamp((inside + vh * .1) / (r.height - vh * .9), 0, 1).toFixed(4));
+            const i = clamp(Math.floor((inside + vh * .1) / vh), 0, nSlides - 1);
+            if (i === slideIdx) return;
+            slideIdx = i;
+            slideTrack.style.transform = `translate3d(${-i * 100}%, 0, 0)`;
+            slideTexts.forEach((t, k) => t.classList.toggle('is-active', k === i));
+            slideCount.textContent = `${String(i + 1).padStart(2, '0')} / ${String(nSlides).padStart(2, '0')}`;
+        }
+        function goToSlide(i) {
+            const top = slides.getBoundingClientRect().top + window.scrollY + i * window.innerHeight;
+            window.scrollTo({ top, behavior: reduced ? 'auto' : 'smooth' });
+        }
+
+        // ================= BARA DE REZERVARE DE PE MOBIL: ASCUNSĂ PE SLIDERUL FIXAT =================
+        // Ca la Terreno: bara de jos dispare cât timp secțiunea fixată ocupă ecranul.
+        function updateMobileFinder(vh) {
+            const r = slides.getBoundingClientRect();
+            body.classList.toggle('mfinder-off', r.top < vh * .5 && r.bottom > vh * .5);
+        }
+
+        // ================= BUCLA DE SCROLL =================
+        let ticking = false;
+        function frame() {
+            ticking = false;
+            const vh = window.innerHeight;
+            updateColors(vh);
+            updateHero(vh);
+            updateParallax(vh);
+            updateSlides(vh);
+            updateMobileFinder(vh);
+        }
+        const requestFrame = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
+        window.addEventListener('scroll', requestFrame, { passive: true });
+        window.addEventListener('resize', () => { lastHero = -1; requestFrame(); });
+        if (document.fonts) document.fonts.ready.then(requestFrame);
+        requestFrame();
+
+        // ================= REVEAL LA INTRARE ÎN ECRAN =================
+        const revealIO = new IntersectionObserver(entries => entries.forEach(e => {
+            if (e.isIntersecting) { e.target.classList.add('is-in'); revealIO.unobserve(e.target); }
+        }), { threshold: .15, rootMargin: '0px 0px -6% 0px' });
+        const observeReveals = () => $$('[data-reveal]:not(.is-in)').forEach(el => revealIO.observe(el));
+
+        // ================= MENIU CARTIER / HOTEL =================
+        const menu = $('#menu');
+        const navBtns = $$('[data-menu]');
+        function animateColumn(which) {
+            const col = $(`.menu__col--${which}`, menu);
+            col.classList.remove('is-animating');
+            void col.offsetWidth;
+            col.classList.add('is-animating');
+        }
+        function setMenu(which) {
+            const changed = menu.dataset.active !== which || !menu.classList.contains('is-open');
+            menu.dataset.active = which;
+            navBtns.forEach(b => b.setAttribute('aria-expanded', String(menu.classList.contains('is-open') && b.dataset.menu === which)));
+            $$('.menu__tabs [data-menu-switch]', menu).forEach(t => t.setAttribute('aria-selected', String(t.dataset.menuSwitch === which)));
+            if (changed && !reduced) animateColumn(which);
+        }
+        function openMenu(which) {
+            const wasOpen = menu.classList.contains('is-open');
+            menu.classList.add('is-open');
+            menu.setAttribute('aria-hidden', 'false');
+            body.classList.add('menu-open');
+            root.classList.add('is-locked');
+            if (!wasOpen) menu.dataset.active = '';
+            setMenu(which);
+        }
+        function closeMenu() {
+            menu.classList.remove('is-open');
+            menu.setAttribute('aria-hidden', 'true');
+            body.classList.remove('menu-open');
+            root.classList.remove('is-locked');
+            navBtns.forEach(b => b.setAttribute('aria-expanded', 'false'));
+        }
+        navBtns.forEach(b => b.addEventListener('click', () => {
+            const which = b.dataset.menu;
+            if (menu.classList.contains('is-open') && menu.dataset.active === which) closeMenu();
+            else openMenu(which);
+        }));
+        $$('[data-menu-switch]').forEach(b => b.addEventListener('click', () => openMenu(b.dataset.menuSwitch)));
+        $$('[data-menu-open]').forEach(b => b.addEventListener('click', () => openMenu(b.dataset.menuOpen)));
+        $('[data-menu-toggle]').addEventListener('click', () => menu.classList.contains('is-open') ? closeMenu() : openMenu('cartier'));
+        $('[data-menu-close]').addEventListener('click', closeMenu);
+        $$('.menu__link', menu).forEach(a => a.addEventListener('click', e => {
+            closeMenu();
+            if (a.dataset.slide !== undefined) { e.preventDefault(); goToSlide(+a.dataset.slide); }
+        }));
+
+        // ================= BADGE: ICONIȚE CARE SE SCHIMBĂ =================
+        const badgeIcons = $$('.badge__icon > *');
+        let badgeIdx = 0;
+        if (!reduced) setInterval(() => {
+            badgeIcons[badgeIdx].classList.remove('is-on');
+            badgeIdx = (badgeIdx + 1) % badgeIcons.length;
+            badgeIcons[badgeIdx].classList.add('is-on');
+        }, 2400);
+
+        // ================= BARA DE REZERVARE =================
+        // O singură stare, folosită de bara din hero (desktop) și de panoul de pe mobil
+        const guests = { adults: 2, children: 0, rooms: 1 };
+        const stay = { in: '', out: '' };
+        const isMobile = () => matchMedia('(max-width: 767px)').matches;
+        const toISO = d => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+        const fromISO = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+        const addDays = (s, n) => { const d = fromISO(s); d.setDate(d.getDate() + n); return toISO(d); };
+        const fmtDate = s => fromISO(s).toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' });
+        const nightsBetween = () => Math.round((fromISO(stay.out) - fromISO(stay.in)) / 86400000);
+        const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+        const todayISO = toISO(new Date());
+        stay.in = addDays(todayISO, 1);
+        stay.out = addDays(todayISO, 5);
+
+        function renderDates() {
+            $$('[data-date="in"]').forEach(i => { i.min = todayISO; i.value = stay.in; });
+            $$('[data-date="out"]').forEach(o => { o.min = addDays(stay.in, 1); o.value = stay.out; });
+            $$('[data-out="dates"]').forEach(el => { el.textContent = `${fmtDate(stay.in)} — ${fmtDate(stay.out)}`; });
+            $$('[data-out="nights"]').forEach(el => { el.textContent = plural(nightsBetween(), 'noapte', 'nopți'); });
+        }
+        $$('[data-date="in"]').forEach(input => input.addEventListener('change', () => {
+            if (input.value && input.value >= todayISO) {
+                stay.in = input.value;
+                if (stay.out <= stay.in) stay.out = addDays(stay.in, 1);
+            }
+            renderDates();
+        }));
+        $$('[data-date="out"]').forEach(input => input.addEventListener('change', () => {
+            stay.out = input.value && input.value > stay.in ? input.value : addDays(stay.in, 1);
+            renderDates();
+        }));
+        $$('[data-promo]').forEach(input => input.addEventListener('input', () => {
+            $$('[data-promo]').forEach(other => { if (other !== input) other.value = input.value; });
+        }));
+
+        const guestsLabel = () => {
+            const parts = [plural(guests.adults, 'adult', 'adulți')];
+            if (guests.children) parts.push(plural(guests.children, 'copil', 'copii'));
+            return `${parts.join(', ')} · ${plural(guests.rooms, 'cameră', 'camere')}`;
+        };
+        function renderGuests() {
+            $$('[data-out="guests"]').forEach(el => { el.textContent = guestsLabel(); });
+            $$('[data-out="guests-count"]').forEach(el => { el.textContent = guests.adults + guests.children; });
+            $$('[data-stepper]').forEach(s => {
+                const key = s.dataset.stepper;
+                $('output', s).textContent = guests[key];
+                $('[data-step="-1"]', s).disabled = guests[key] <= +s.dataset.min;
+                $('[data-step="1"]', s).disabled = guests[key] >= +s.dataset.max;
+            });
+        }
+        $$('[data-stepper]').forEach(s => s.addEventListener('click', e => {
+            const btn = e.target.closest('[data-step]');
+            if (!btn) return;
+            e.stopPropagation();
+            const key = s.dataset.stepper;
+            guests[key] = clamp(guests[key] + +btn.dataset.step, +s.dataset.min, +s.dataset.max);
+            renderGuests();
+        }));
+        renderDates();
+        renderGuests();
+
+        function closePops(except) {
+            $$('.pop.is-open').forEach(p => {
+                if (p === except) return;
+                p.classList.remove('is-open');
+                p.closest('[data-pop]').setAttribute('aria-expanded', 'false');
+            });
+        }
+        $$('[data-pop]').forEach(field => {
+            const pop = $(`[data-popover="${field.dataset.pop}"]`, field);
+            const toggle = () => {
+                const open = !pop.classList.contains('is-open');
+                closePops(pop);
+                pop.classList.toggle('is-open', open);
+                field.setAttribute('aria-expanded', String(open));
+            };
+            field.addEventListener('click', e => { if (!pop.contains(e.target)) toggle(); });
+            field.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target === field) { e.preventDefault(); toggle(); } });
+        });
+        document.addEventListener('click', e => { if (!e.target.closest('[data-pop]')) closePops(); });
+
+        // ---------- Panoul de rezervare de pe mobil ----------
+        const sheet = $('.sheet');
+        const sheetPanel = $('.sheet__panel', sheet);
+        let sheetOpener = null;
+        function openSheet(group) {
+            sheetOpener = document.activeElement;
+            sheet.classList.add('is-open');
+            sheet.setAttribute('aria-hidden', 'false');
+            root.classList.add('is-locked');
+            const target = $(`[data-group="${group}"]`, sheet);
+            $$('.sheet__group', sheet).forEach(g => g.classList.toggle('is-focus', g === target));
+            setTimeout(() => {
+                if (!target) return;
+                target.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+                // focus doar pe câmpul de text, ca tastatura să nu acopere panoul la date / oaspeți
+                if (group === 'promo') $('input', target).focus({ preventScroll: true });
+                else $('[data-sheet-close]', sheetPanel).focus({ preventScroll: true });
+                setTimeout(() => target.classList.remove('is-focus'), 1400);
+            }, reduced ? 0 : 450);
+        }
+        function closeSheet() {
+            if (!sheet.classList.contains('is-open')) return false;
+            sheet.classList.remove('is-open');
+            sheet.setAttribute('aria-hidden', 'true');
+            root.classList.remove('is-locked');
+            sheetPanel.style.transform = '';
+            if (sheetOpener && sheetOpener.focus) sheetOpener.focus({ preventScroll: true });
+            return true;
+        }
+        $$('[data-sheet]').forEach(b => b.addEventListener('click', () => openSheet(b.dataset.sheet)));
+        $$('[data-sheet-close]', sheet).forEach(b => b.addEventListener('click', closeSheet));
+        // trage panoul în jos ca să-l închizi
+        (() => {
+            const grab = $('[data-sheet-grab]', sheet);
+            let y0 = null, dy = 0;
+            grab.addEventListener('pointerdown', e => {
+                if (e.target.closest('button')) return;
+                y0 = e.clientY; dy = 0;
+                sheetPanel.classList.add('is-dragging');
+                grab.setPointerCapture(e.pointerId);
+            });
+            grab.addEventListener('pointermove', e => {
+                if (y0 === null) return;
+                dy = Math.max(0, e.clientY - y0);
+                sheetPanel.style.transform = `translate3d(0, ${dy}px, 0)`;
+            });
+            const end = () => {
+                if (y0 === null) return;
+                y0 = null;
+                sheetPanel.classList.remove('is-dragging');
+                if (dy > 90) closeSheet();
+                else sheetPanel.style.transform = '';
+            };
+            grab.addEventListener('pointerup', end);
+            grab.addEventListener('pointercancel', end);
+        })();
+        // pe ecran lat panoul nu există; dacă rămâne deschis la rotirea ecranului, îl închidem
+        matchMedia('(max-width: 767px)').addEventListener('change', e => { if (!e.matches) closeSheet(); });
+
+        $$('[data-search]').forEach(b => b.addEventListener('click', () => {
+            closePops();
+            closeSheet();
+            toast(`Avem camere libere pentru ${guestsLabel()}, ${fmtDate(stay.in)} — ${fmtDate(stay.out)} (${plural(nightsBetween(), 'noapte', 'nopți')}). Aceasta este o demonstrație de design.`);
+        }));
+        $$('[data-book]').forEach(a => a.addEventListener('click', e => {
+            e.preventDefault();
+            closeMenu();
+            if (isMobile()) { openSheet('dates'); return; }
+            window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+            setTimeout(() => $('[data-pop="dates"]').click(), reduced ? 0 : 700);
+        }));
+        $('[data-scroll-next]').addEventListener('click', () => {
+            window.scrollTo({ top: window.innerHeight * .95, behavior: reduced ? 'auto' : 'smooth' });
+        });
+
+        // ================= CAMERE: CARDURI CU SLIDER =================
+        const roomsGrid = $('[data-rooms]');
+        roomsGrid.innerHTML = ROOMS.map((r, i) => `
+            <article class="room" data-reveal style="--d:${(i % 2) * 140}ms">
+                <div class="room__media" data-room="${i}">
+                    <div class="room__track">${r.imgs.map((id, k) => `<img src="${img(id, 1000)}" alt="${r.name}, imaginea ${k + 1}" loading="lazy" draggable="false">`).join('')}</div>
+                    <div class="room__ui">
+                        <span class="room__count">1/${r.imgs.length}</span>
+                        <button class="room__expand" type="button" aria-label="Galeria ${r.name} pe tot ecranul">${ICON.expand}</button>
+                    </div>
+                    <button class="room__nav room__nav--prev" type="button" data-dir="-1" aria-label="Imaginea anterioară">${ICON.left}</button>
+                    <button class="room__nav room__nav--next" type="button" data-dir="1" aria-label="Imaginea următoare">${ICON.right}</button>
+                </div>
+                <div class="room__info">
+                    <h3 class="room__title t-cond">${r.name}</h3>
+                    <span class="t-label room__meta">${r.size} · de la ${r.price} €</span>
+                    <span class="t-label room__size m-only">${r.size}</span>
+                </div>
+                <p class="room__desc copy">${r.desc}</p>
+                <div class="room__buy m-only">
+                    <span class="room__price"><small>de la</small> ${r.price} € <small>/ noapte</small></span>
+                    <button class="room__book gloss" type="button">Rezervă</button>
+                </div>
+            </article>`).join('');
+
+        // Pe mobil: butonul „Rezervă” din card deschide panoul de rezervare
+        $$('.room__book', roomsGrid).forEach(b => b.addEventListener('click', () => openSheet('dates')));
+
+        // Pe mobil: indicatorul caruselului de camere (1 / 6 + bară de progres)
+        (() => {
+            const countEl = $('[data-rooms-count]');
+            const barEl = $('[data-rooms-bar]');
+            const cards = $$('.room', roomsGrid);
+            let raf = 0;
+            const update = () => {
+                raf = 0;
+                const max = roomsGrid.scrollWidth - roomsGrid.clientWidth;
+                if (max <= 0) return;
+                const step = cards[1].offsetLeft - cards[0].offsetLeft;
+                countEl.textContent = `${clamp(Math.round(roomsGrid.scrollLeft / step) + 1, 1, cards.length)} / ${cards.length}`;
+                barEl.style.transform = `scaleX(${(.15 + .85 * roomsGrid.scrollLeft / max).toFixed(3)})`;
+            };
+            roomsGrid.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+            update();
+        })();
+
+        $$('.room__media', roomsGrid).forEach(media => {
+            const room = ROOMS[+media.dataset.room];
+            const track = $('.room__track', media);
+            const count = $('.room__count', media);
+            let idx = 0;
+            const go = i => {
+                idx = (i + room.imgs.length) % room.imgs.length;
+                track.style.transform = `translate3d(${-idx * 100}%, 0, 0)`;
+                count.textContent = `${idx + 1}/${room.imgs.length}`;
+            };
+            $$('.room__nav', media).forEach(b => b.addEventListener('click', () => go(idx + +b.dataset.dir)));
+            $('.room__expand', media).addEventListener('click', () => openLightbox(room, idx));
+            // Pe mobil swipe-ul orizontal aparține caruselului de camere, deci atingerea pe poză deschide galeria
+            media.addEventListener('click', e => {
+                if (isMobile() && !e.target.closest('button')) openLightbox(room, idx);
+            });
+            // swipe pe touch (tabletă / ecran lat)
+            let sx = null;
+            media.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' && !isMobile()) sx = e.clientX; });
+            media.addEventListener('pointerup', e => {
+                if (sx === null) return;
+                const dx = e.clientX - sx; sx = null;
+                if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1));
+            });
+        });
+
+        // ================= LIGHTBOX =================
+        const lb = $('.lightbox');
+        const lbImg = $('[data-lb="img"]', lb);
+        const lb_state = { room: null, idx: 0, opener: null };
+        function lbRender() {
+            const { room, idx } = lb_state;
+            lbImg.classList.add('is-fading');
+            setTimeout(() => {
+                lbImg.src = img(room.imgs[idx], 1800);
+                lbImg.alt = `${room.name}, imaginea ${idx + 1}`;
+                lbImg.onload = () => lbImg.classList.remove('is-fading');
+            }, reduced ? 0 : 180);
+            $('[data-lb="count"]', lb).textContent = `${idx + 1} / ${room.imgs.length}`;
+        }
+        function openLightbox(room, idx) {
+            lb_state.room = room; lb_state.idx = idx; lb_state.opener = document.activeElement;
+            $('[data-lb="title"]', lb).textContent = room.name;
+            lbRender();
+            lb.classList.add('is-open');
+            lb.setAttribute('aria-hidden', 'false');
+            root.classList.add('is-locked');
+            $('[data-lb-close]', lb).focus();
+        }
+        function closeLightbox() {
+            if (!lb.classList.contains('is-open')) return false;
+            lb.classList.remove('is-open');
+            lb.setAttribute('aria-hidden', 'true');
+            root.classList.remove('is-locked');
+            if (lb_state.opener) lb_state.opener.focus();
+            return true;
+        }
+        const lbStep = d => { lb_state.idx = (lb_state.idx + d + lb_state.room.imgs.length) % lb_state.room.imgs.length; lbRender(); };
+        $$('[data-lb-step]', lb).forEach(b => b.addEventListener('click', () => lbStep(+b.dataset.lbStep)));
+        $('[data-lb-close]', lb).addEventListener('click', closeLightbox);
+        lb.addEventListener('click', e => { if (e.target === lb || e.target.classList.contains('lightbox__stage')) closeLightbox(); });
+        let lbx = null;
+        $('.lightbox__stage', lb).addEventListener('pointerdown', e => { lbx = e.clientX; });
+        $('.lightbox__stage', lb).addEventListener('pointerup', e => {
+            if (lbx === null) return;
+            const dx = e.clientX - lbx; lbx = null;
+            if (Math.abs(dx) > 50) lbStep(dx < 0 ? 1 : -1);
+        });
+
+        // ================= TASTATURĂ =================
+        document.addEventListener('keydown', e => {
+            if (lb.classList.contains('is-open')) {
+                if (e.key === 'ArrowRight') lbStep(1);
+                if (e.key === 'ArrowLeft') lbStep(-1);
+            }
+            if (e.key !== 'Escape') return;
+            if (closeLightbox()) return;
+            if (closeSheet()) return;
+            if ($('.pop.is-open')) { closePops(); return; }
+            if (menu.classList.contains('is-open')) closeMenu();
+        });
+
+        // ================= TEANC DE POLAROIDE (apar pe rând, cu rotire) =================
+        (() => {
+            const stack = $('[data-stack]');
+            const cards = $$('.day__card', stack);
+            const FADE = 700, HOLD = 1500, STEP = 3, SCALE_FROM = 1.3;
+            const tf = (deg, s) => `rotate(${deg}deg) scale(${s})`;
+            cards.forEach(c => { c._s = +c.dataset.start * STEP; c._e = +c.dataset.end * STEP; });
+            let timer = null, k = 1;
+            const set = (c, opacity, deg, scale, animate) => {
+                const p = c.firstElementChild;
+                c.style.transition = animate ? `opacity ${FADE}ms ease-out` : 'none';
+                p.style.transition = animate ? `transform ${FADE}ms ease-out` : 'none';
+                c.style.opacity = opacity;
+                p.style.transform = tf(deg, scale);
+            };
+            const reset = animate => cards.forEach((c, i) => {
+                if (i === 0) set(c, 1, c._e, 1, false);
+                else if (animate) { c.style.transition = `opacity ${FADE}ms ease-out`; c.style.opacity = 0; }
+                else set(c, 0, c._s, SCALE_FROM, false);
+            });
+            const show = c => {
+                set(c, 0, c._s, SCALE_FROM, false);
+                void c.offsetWidth;
+                set(c, 1, c._e, 1, true);
+            };
+            const step = () => {
+                show(cards[k]);
+                k++;
+                if (k < cards.length) timer = setTimeout(step, FADE + HOLD);
+                else timer = setTimeout(() => { reset(true); k = 1; timer = setTimeout(step, FADE + HOLD); }, FADE + HOLD * 1.6);
+            };
+            const stop = () => { clearTimeout(timer); timer = null; k = 1; reset(false); };
+            reset(false);
+            if (reduced) { cards.forEach(c => set(c, 1, c._e, 1, false)); return; }
+            new IntersectionObserver(([e]) => {
+                if (e.isIntersecting && !timer) timer = setTimeout(step, HOLD * .6);
+                else if (!e.isIntersecting && timer) stop();
+            }, { threshold: .3 }).observe(stack);
+        })();
+
+        // ================= CRONOLOGIA DE 24 DE ORE =================
+        (() => {
+            const wrap = $('[data-hours]');
+            const bar = $('.hours__bar', wrap);
+            const panel = $('.hours__panel', wrap);
+            bar.insertAdjacentHTML('beforeend', HOURS.map((h, i) =>
+                `<button class="hours__btn" type="button" role="tab" aria-selected="false" data-i="${i}">${h.h}</button>`).join(''));
+            const btns = $$('.hours__btn', bar);
+            let idx = -1, auto = null, pausedUntil = 0;
+            const fill = (h) => {
+                $('[data-h="time"]', panel).textContent = h.h;
+                $('[data-h="title"]', panel).textContent = h.t;
+                $('[data-h="text"]', panel).textContent = h.d;
+                const im = $('[data-h="img"]', panel);
+                im.src = img(h.img, 800);
+                im.alt = h.t;
+            };
+            function select(i, user) {
+                if (i === idx) return;
+                idx = i;
+                if (user) pausedUntil = Date.now() + 12000;
+                btns.forEach((b, k) => b.setAttribute('aria-selected', String(k === i)));
+                bar.style.setProperty('--hp', (i / (HOURS.length - 1)).toFixed(3));
+                if (user) btns[i].scrollIntoView({ block: 'nearest', inline: 'center', behavior: reduced ? 'auto' : 'smooth' });
+                if (reduced) { fill(HOURS[i]); return; }
+                panel.classList.add('is-swapping');
+                setTimeout(() => { fill(HOURS[i]); panel.classList.remove('is-swapping'); }, 300);
+            }
+            btns.forEach(b => b.addEventListener('click', () => select(+b.dataset.i, true)));
+            fill(HOURS[0]);
+            idx = 0;
+            btns[0].setAttribute('aria-selected', 'true');
+            if (reduced) return;
+            new IntersectionObserver(([e]) => {
+                if (e.isIntersecting && !auto) auto = setInterval(() => { if (Date.now() > pausedUntil) select((idx + 1) % HOURS.length); }, 4200);
+                else if (!e.isIntersecting && auto) { clearInterval(auto); auto = null; }
+            }, { threshold: .35 }).observe(wrap);
+        })();
+
+        // ================= GALERIA CARE PLUTEȘTE (dus-întors + drag) =================
+        (() => {
+            const drift = $('[data-drift]');
+            const track = $('.drift__track', drift);
+            track.innerHTML = DRIFT.map(([id, alt]) => `<figure class="drift__item"><img src="${img(id, 700)}" alt="${alt}" loading="lazy" draggable="false"></figure>`).join('');
+            let x = 0, dir = -1, last = 0, running = false, dragging = false, startX = 0, startPos = 0;
+            const SPEED = 38; // px pe secundă
+            const maxX = () => Math.max(0, track.scrollWidth - drift.clientWidth);
+            const apply = () => { track.style.transform = `translate3d(${x.toFixed(1)}px, 0, 0)`; };
+            function loop(t) {
+                if (!running) return;
+                const dt = last ? Math.min((t - last) / 1000, .05) : 0;
+                last = t;
+                if (!dragging && !reduced) {
+                    x += dir * SPEED * dt;
+                    if (x <= -maxX()) { x = -maxX(); dir = 1; }
+                    if (x >= 0) { x = 0; dir = -1; }
+                    apply();
+                }
+                requestAnimationFrame(loop);
+            }
+            new IntersectionObserver(([e]) => {
+                running = e.isIntersecting;
+                if (running) { last = 0; requestAnimationFrame(loop); }
+            }).observe(drift);
+            drift.addEventListener('pointerdown', e => {
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                dragging = true; startX = e.clientX; startPos = x;
+                drift.classList.add('is-dragging');
+                drift.setPointerCapture(e.pointerId);
+            });
+            drift.addEventListener('pointermove', e => {
+                if (!dragging) return;
+                const dx = e.clientX - startX;
+                x = clamp(startPos + dx, -maxX(), 0);
+                if (Math.abs(dx) > 2) dir = dx < 0 ? -1 : 1;
+                apply();
+            });
+            const end = () => { dragging = false; drift.classList.remove('is-dragging'); };
+            drift.addEventListener('pointerup', end);
+            drift.addEventListener('pointercancel', end);
+        })();
+
+        observeReveals();
+    })();
+    </script>
+</body>
+</html>
